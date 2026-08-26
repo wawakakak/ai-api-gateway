@@ -4,43 +4,85 @@ const express = require("express");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
 const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
+const QWEN_API_URL =
+  "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("Hello World! My first AI API service is running!");
 });
 
+function resolveChatMessages(body) {
+  const { message, messages } = body;
+  if (Array.isArray(messages) && messages.length > 0) {
+    return messages;
+  }
+  if (typeof message === "string" && message.trim()) {
+    return [{ role: "user", content: message }];
+  }
+  return null;
+}
+
 app.post("/chat", async (req, res) => {
-  const apiKey = process.env.DEEPSEEK_API_KEY;
-  if (!apiKey) {
-    return res.status(500).json({
-      error: "Missing DEEPSEEK_API_KEY. Set it in your .env file.",
+  const body = req.body || {};
+  // Read model from JSON body first; fall back to query string for clients that
+  // cannot send a JSON field. Normalize so "Qwen" / " qwen " still match.
+  const requestedModel = body.model ?? req.query.model;
+  const modelName =
+    typeof requestedModel === "string" && requestedModel.trim()
+      ? requestedModel.trim().toLowerCase()
+      : "deepseek";
+
+  let apiUrl;
+  let apiKey;
+  let upstreamModel;
+  let providerName;
+  let apiKeyEnv;
+
+  if (modelName === "qwen") {
+    apiUrl = QWEN_API_URL;
+    apiKeyEnv = "QWEN_API_KEY";
+    apiKey = process.env.QWEN_API_KEY;
+    upstreamModel = "qwen3.7-flash";
+    providerName = "Qwen";
+  } else if (modelName === "deepseek") {
+    apiUrl = DEEPSEEK_API_URL;
+    apiKeyEnv = "DEEPSEEK_API_KEY";
+    apiKey = process.env.DEEPSEEK_API_KEY;
+    upstreamModel = "deepseek-chat";
+    providerName = "DeepSeek";
+  } else {
+    return res.status(400).json({
+      error: `Unsupported model "${requestedModel}". Use "deepseek" or "qwen".`,
     });
   }
 
-  const { message, messages } = req.body || {};
-  let chatMessages = messages;
+  if (!apiKey) {
+    return res.status(500).json({
+      error: `Missing ${apiKeyEnv}. Set it in your .env file.`,
+    });
+  }
 
-  if (!Array.isArray(chatMessages) || chatMessages.length === 0) {
-    if (typeof message !== "string" || !message.trim()) {
-      return res.status(400).json({
-        error: 'Provide a "message" string or a "messages" array in the JSON body.',
-      });
-    }
-    chatMessages = [{ role: "user", content: message }];
+  const chatMessages = resolveChatMessages(body);
+  if (!chatMessages) {
+    return res.status(400).json({
+      error: 'Provide a "message" string or a "messages" array in the JSON body.',
+    });
   }
 
   try {
-    const response = await fetch(DEEPSEEK_API_URL, {
+    const response = await fetch(apiUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "deepseek-chat",
+        model: upstreamModel,
         messages: chatMessages,
       }),
     });
@@ -49,16 +91,21 @@ app.post("/chat", async (req, res) => {
 
     if (!response.ok) {
       return res.status(response.status).json({
-        error: "DeepSeek API request failed",
+        error: `${providerName} API request failed`,
         details: data,
       });
     }
 
     const reply = data?.choices?.[0]?.message?.content ?? "";
-    return res.json({ reply, raw: data });
+    return res.json({
+      reply,
+      model: modelName,
+      provider: providerName,
+      raw: data,
+    });
   } catch (error) {
     return res.status(502).json({
-      error: "Failed to call DeepSeek API",
+      error: `Failed to call ${providerName} API`,
       details: error.message,
     });
   }
