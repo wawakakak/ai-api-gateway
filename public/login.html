@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>管理员登录 — AI API Gateway</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: {
+                950: "#0b0d12",
+                900: "#11141b",
+                800: "#171b24",
+                700: "#1e2430",
+                600: "#2a3140",
+              },
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-ink-950 text-slate-200 antialiased">
+    <main class="flex min-h-screen items-center justify-center px-4 py-12">
+      <div class="w-full max-w-md rounded-xl border border-slate-800 bg-ink-900 p-8 shadow-xl shadow-cyan-500/5">
+        <p class="text-xs font-medium uppercase tracking-[0.25em] text-cyan-400/80">
+          Admin
+        </p>
+        <h1
+          class="mt-3 bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-3xl font-semibold tracking-tight text-transparent"
+        >
+          管理员登录
+        </h1>
+        <p class="mt-2 text-sm text-slate-400">登录后进入 AI API Gateway 管理后台</p>
+
+        <form id="login-form" class="mt-8 space-y-4">
+          <div>
+            <label for="username" class="block text-sm text-slate-300">用户名</label>
+            <input
+              id="username"
+              name="username"
+              type="text"
+              autocomplete="username"
+              required
+              class="mt-1 w-full rounded-lg border border-slate-700 bg-ink-800 px-3 py-2 text-white outline-none focus:border-cyan-500"
+            />
+          </div>
+          <div>
+            <label for="password" class="block text-sm text-slate-300">密码</label>
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+              class="mt-1 w-full rounded-lg border border-slate-700 bg-ink-800 px-3 py-2 text-white outline-none focus:border-cyan-500"
+            />
+          </div>
+          <button
+            type="submit"
+            class="w-full rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-500"
+          >
+            登录
+          </button>
+          <p id="login-error" class="hidden text-center text-sm text-red-400">
+            用户名或密码错误
+          </p>
+        </form>
+
+        <p class="mt-8 text-center text-sm text-slate-500">
+          <a href="/" class="transition hover:text-cyan-300">← 返回官网</a>
+        </p>
+      </div>
+    </main>
+
+    <script>
+      const form = document.getElementById("login-form");
+      const errorEl = document.getElementById("login-error");
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        errorEl.classList.add("hidden");
+
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value;
+
+        try {
+          const response = await fetch("/auth/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify({ username, password }),
+          });
+          const data = await response.json();
+          if (!data.success) {
+            errorEl.textContent = data.message || "用户名或密码错误";
+            errorEl.classList.remove("hidden");
+            return;
+          }
+          window.location.href = "/admin";
+        } catch (error) {
+          errorEl.textContent = "用户名或密码错误";
+          errorEl.classList.remove("hidden");
+        }
+      });
+    </script>
+  </body>
+</html>

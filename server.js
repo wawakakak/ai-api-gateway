@@ -1,8 +1,11 @@
+// npm install express-session dotenv
 require("dotenv").config();
 
 const crypto = require("crypto");
+const fs = require("fs");
 const path = require("path");
 const express = require("express");
+const session = require("express-session");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -19,13 +22,93 @@ const users = new Map();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    secret: "ai-gateway-secret-2026",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { httpOnly: true, maxAge: 24 * 60 * 60 * 1000 },
+  })
+);
 
 app.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "landing.html"));
 });
 
+app.post("/auth/login", (req, res) => {
+  const { username, password } = req.body || {};
+  const adminUsername = process.env.ADMIN_USERNAME;
+  const adminPassword = process.env.ADMIN_PASSWORD;
+  const valid =
+    typeof username === "string" &&
+    typeof password === "string" &&
+    adminUsername &&
+    adminPassword &&
+    username === adminUsername &&
+    password === adminPassword;
+
+  if (!valid) {
+    return res.json({ success: false, message: "用户名或密码错误" });
+  }
+
+  req.session.isAdmin = true;
+  return res.json({ success: true });
+});
+
+app.post("/auth/logout", (req, res) => {
+  req.session.destroy(() => {
+    res.json({ success: true });
+  });
+});
+
+const LOGOUT_SNIPPET = `
+          <button
+            id="logout-btn"
+            type="button"
+            class="rounded-lg border border-slate-700 bg-ink-800 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-rose-500 hover:text-rose-300"
+          >
+            退出登录
+          </button>
+`;
+
+const LOGOUT_SCRIPT = `
+<script>
+  document.getElementById("logout-btn")?.addEventListener("click", async () => {
+    await fetch("/auth/logout", { method: "POST", credentials: "same-origin" });
+    window.location.href = "/";
+  });
+</script>
+`;
+
 app.get("/admin", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  if (!req.session.isAdmin) {
+    return res.sendFile(path.join(__dirname, "public", "login.html"));
+  }
+
+  const dashboardPath = path.join(__dirname, "public", "index.html");
+  fs.readFile(dashboardPath, "utf8", (err, html) => {
+    if (err) {
+      return res.status(500).send("Failed to load dashboard");
+    }
+    const withLogout = html
+      .replace(
+        `id="generate-btn"
+            type="button"
+            class="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-ink-950 transition hover:bg-cyan-400"
+          >
+            生成新 Key
+          </button>`,
+        `id="generate-btn"
+            type="button"
+            class="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-ink-950 transition hover:bg-cyan-400"
+          >
+            生成新 Key
+          </button>
+${LOGOUT_SNIPPET}`
+      )
+      .replace("</body>", `${LOGOUT_SCRIPT}</body>`);
+    res.type("html").send(withLogout);
+  });
 });
 
 app.use(express.static("public"));

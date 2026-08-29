@@ -6,13 +6,18 @@
   "scripts": {
     "start": "node server.js"
   },
-  "keywords": ["express", "deepseek", "api"],
+  "keywords": [
+    "express",
+    "deepseek",
+    "api"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=18"
   },
   "dependencies": {
-    "dotenv": "^16.4.5",
-    "express": "^4.21.2"
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "express-session": "^1.19.0"
   }
 }
