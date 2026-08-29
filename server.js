@@ -18,10 +18,7 @@ const users = new Map();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.get("/", (req, res) => {
-  res.send("Hello World! My first AI API service is running!");
-});
+app.use(express.static("public"));
 
 function generateVirtualKey() {
   return VIRTUAL_KEY_PREFIX + crypto.randomBytes(8).toString("hex");

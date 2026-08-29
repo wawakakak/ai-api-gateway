@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI API Gateway 管理后台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              ink: {
+                950: "#0b0d12",
+                900: "#11141b",
+                800: "#171b24",
+                700: "#1e2430",
+                600: "#2a3140",
+              },
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-ink-950 text-slate-200 antialiased">
+    <div class="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
+      <header class="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <p class="text-xs font-medium uppercase tracking-[0.2em] text-cyan-400/80">
+            Dashboard
+          </p>
+          <h1 class="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+            AI API Gateway 管理后台
+          </h1>
+          <p class="mt-2 text-sm text-slate-400">
+            管理虚拟 API Key、查看用量并充值额度
+          </p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            id="refresh-btn"
+            type="button"
+            class="rounded-lg border border-slate-700 bg-ink-800 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-slate-500 hover:bg-ink-700"
+          >
+            刷新数据
+          </button>
+          <button
+            id="generate-btn"
+            type="button"
+            class="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-ink-950 transition hover:bg-cyan-400"
+          >
+            生成新 Key
+          </button>
+        </div>
+      </header>
+
+      <section
+        id="generated-banner"
+        class="mb-6 hidden rounded-xl border border-cyan-500/30 bg-cyan-500/10 p-4"
+      >
+        <p class="text-xs font-medium uppercase tracking-wide text-cyan-300">
+          新生成的虚拟 Key
+        </p>
+        <div class="mt-2 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <code
+            id="generated-key"
+            class="break-all font-mono text-sm text-cyan-100 sm:text-base"
+          ></code>
+          <button
+            id="copy-key-btn"
+            type="button"
+            class="shrink-0 rounded-lg border border-cyan-500/40 bg-ink-900 px-3 py-1.5 text-sm text-cyan-200 hover:bg-ink-800"
+          >
+            复制
+          </button>
+        </div>
+      </section>
+
+      <p id="status-message" class="mb-4 hidden text-sm"></p>
+
+      <section class="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <article class="rounded-xl border border-slate-800 bg-ink-900 p-5">
+          <p class="text-sm text-slate-400">总用户数</p>
+          <p id="stat-users" class="mt-2 text-3xl font-semibold text-white">0</p>
+        </article>
+        <article class="rounded-xl border border-slate-800 bg-ink-900 p-5">
+          <p class="text-sm text-slate-400">总 Token 消耗</p>
+          <p id="stat-used" class="mt-2 text-3xl font-semibold text-white">0</p>
+        </article>
+        <article class="rounded-xl border border-slate-800 bg-ink-900 p-5">
+          <p class="text-sm text-slate-400">平均余额</p>
+          <p id="stat-avg" class="mt-2 text-3xl font-semibold text-white">0</p>
+        </article>
+      </section>
+
+      <section class="overflow-hidden rounded-xl border border-slate-800 bg-ink-900">
+        <div class="border-b border-slate-800 px-4 py-3 sm:px-5">
+          <h2 class="text-sm font-medium text-white">用户列表</h2>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-left text-sm">
+            <thead class="bg-ink-800 text-xs uppercase tracking-wide text-slate-400">
+              <tr>
+                <th class="px-4 py-3 font-medium sm:px-5">Key</th>
+                <th class="px-4 py-3 font-medium sm:px-5">余额</th>
+                <th class="px-4 py-3 font-medium sm:px-5">累计使用</th>
+                <th class="px-4 py-3 font-medium sm:px-5">状态</th>
+                <th class="px-4 py-3 font-medium sm:px-5">操作</th>
+              </tr>
+            </thead>
+            <tbody id="users-table" class="divide-y divide-slate-800"></tbody>
+          </table>
+        </div>
+        <p id="empty-state" class="hidden px-4 py-10 text-center text-sm text-slate-500 sm:px-5">
+          还没有虚拟 Key，点击「生成新 Key」开始。
+        </p>
+      </section>
+    </div>
+
+    <div
+      id="recharge-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center bg-black/70 p-4"
+    >
+      <div class="w-full max-w-md rounded-xl border border-slate-700 bg-ink-900 p-5 shadow-2xl">
+        <h3 class="text-lg font-semibold text-white">充值额度</h3>
+        <p class="mt-1 break-all font-mono text-xs text-slate-400" id="recharge-key-label"></p>
+        <label class="mt-4 block text-sm text-slate-300" for="recharge-amount">
+          充值数量
+        </label>
+        <input
+          id="recharge-amount"
+          type="number"
+          min="1"
+          step="1"
+          value="500000"
+          class="mt-1 w-full rounded-lg border border-slate-700 bg-ink-800 px-3 py-2 text-white outline-none focus:border-cyan-500"
+        />
+        <div class="mt-5 flex justify-end gap-2">
+          <button
+            id="recharge-cancel"
+            type="button"
+            class="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-ink-800"
+          >
+            取消
+          </button>
+          <button
+            id="recharge-confirm"
+            type="button"
+            class="rounded-lg bg-cyan-500 px-4 py-2 text-sm font-semibold text-ink-950 hover:bg-cyan-400"
+          >
+            确认充值
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const usersTable = document.getElementById("users-table");
+      const emptyState = document.getElementById("empty-state");
+      const statusMessage = document.getElementById("status-message");
+      const generatedBanner = document.getElementById("generated-banner");
+      const generatedKeyEl = document.getElementById("generated-key");
+      const modal = document.getElementById("recharge-modal");
+      const rechargeKeyLabel = document.getElementById("recharge-key-label");
+      const rechargeAmount = document.getElementById("recharge-amount");
+
+      let rechargeTargetKey = "";
+
+      function formatNumber(value) {
+        return Number(value || 0).toLocaleString("zh-CN");
+      }
+
+      function maskKey(key) {
+        return String(key).slice(0, 8) + "...";
+      }
+
+      function showStatus(text, isError) {
+        statusMessage.textContent = text;
+        statusMessage.classList.remove("hidden", "text-red-400", "text-emerald-400");
+        statusMessage.classList.add(isError ? "text-red-400" : "text-emerald-400");
+      }
+
+      function renderStats(keys) {
+        const totalUsers = keys.length;
+        const totalUsed = keys.reduce((sum, item) => sum + Number(item.totalUsed || 0), 0);
+        const totalBalance = keys.reduce((sum, item) => sum + Number(item.balance || 0), 0);
+        const avgBalance = totalUsers ? Math.round(totalBalance / totalUsers) : 0;
+
+        document.getElementById("stat-users").textContent = formatNumber(totalUsers);
+        document.getElementById("stat-used").textContent = formatNumber(totalUsed);
+        document.getElementById("stat-avg").textContent = formatNumber(avgBalance);
+      }
+
+      function renderTable(keys) {
+        usersTable.innerHTML = "";
+        emptyState.classList.toggle("hidden", keys.length > 0);
+
+        keys.forEach((item) => {
+          const ok = Number(item.balance) > 0;
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-ink-800/70";
+          tr.innerHTML = `
+            <td class="px-4 py-3 font-mono text-slate-200 sm:px-5">${maskKey(item.key)}</td>
+            <td class="px-4 py-3 sm:px-5">${formatNumber(item.balance)}</td>
+            <td class="px-4 py-3 sm:px-5">${formatNumber(item.totalUsed)}</td>
+            <td class="px-4 py-3 sm:px-5">
+              <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-medium ${
+                ok
+                  ? "bg-emerald-500/15 text-emerald-300"
+                  : "bg-rose-500/15 text-rose-300"
+              }">${ok ? "正常" : "余额不足"}</span>
+            </td>
+            <td class="px-4 py-3 sm:px-5">
+              <button
+                type="button"
+                class="rounded-md border border-slate-700 bg-ink-800 px-3 py-1.5 text-xs font-medium text-slate-200 hover:border-cyan-500 hover:text-cyan-300"
+                data-recharge="${encodeURIComponent(item.key)}"
+              >
+                充值
+              </button>
+            </td>
+          `;
+          usersTable.appendChild(tr);
+        });
+      }
+
+      async function loadUsage() {
+        const response = await fetch("/admin/usage");
+        if (!response.ok) {
+          throw new Error("无法获取用量数据");
+        }
+        const data = await response.json();
+        const keys = Array.isArray(data.keys) ? data.keys : [];
+        renderStats(keys);
+        renderTable(keys);
+      }
+
+      function openRechargeModal(key) {
+        rechargeTargetKey = key;
+        rechargeKeyLabel.textContent = key;
+        rechargeAmount.value = "500000";
+        modal.classList.remove("hidden");
+        modal.classList.add("flex");
+        rechargeAmount.focus();
+      }
+
+      function closeRechargeModal() {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+        rechargeTargetKey = "";
+      }
+
+      document.getElementById("refresh-btn").addEventListener("click", async () => {
+        try {
+          await loadUsage();
+          showStatus("数据已刷新", false);
+        } catch (error) {
+          showStatus(error.message, true);
+        }
+      });
+
+      document.getElementById("generate-btn").addEventListener("click", async () => {
+        try {
+          const response = await fetch("/admin/generate-key", { method: "POST" });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "生成 Key 失败");
+          }
+          generatedKeyEl.textContent = data.key;
+          generatedBanner.classList.remove("hidden");
+          showStatus("已生成新 Key，默认余额 1,000,000", false);
+          await loadUsage();
+        } catch (error) {
+          showStatus(error.message, true);
+        }
+      });
+
+      document.getElementById("copy-key-btn").addEventListener("click", async () => {
+        const key = generatedKeyEl.textContent;
+        if (!key) return;
+        await navigator.clipboard.writeText(key);
+        showStatus("Key 已复制到剪贴板", false);
+      });
+
+      usersTable.addEventListener("click", (event) => {
+        const button = event.target.closest("[data-recharge]");
+        if (!button) return;
+        openRechargeModal(decodeURIComponent(button.dataset.recharge));
+      });
+
+      document.getElementById("recharge-cancel").addEventListener("click", closeRechargeModal);
+      modal.addEventListener("click", (event) => {
+        if (event.target === modal) closeRechargeModal();
+      });
+
+      document.getElementById("recharge-confirm").addEventListener("click", async () => {
+        const amount = Number(rechargeAmount.value);
+        if (!rechargeTargetKey || !Number.isFinite(amount) || amount <= 0) {
+          showStatus("请输入有效的充值数量", true);
+          return;
+        }
+        try {
+          const response = await fetch("/admin/add-balance", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ key: rechargeTargetKey, amount }),
+          });
+          const data = await response.json();
+          if (!response.ok) {
+            throw new Error(data.error || "充值失败");
+          }
+          closeRechargeModal();
+          showStatus("充值成功", false);
+          await loadUsage();
+        } catch (error) {
+          showStatus(error.message, true);
+        }
+      });
+
+      loadUsage().catch((error) => showStatus(error.message, true));
+    </script>
+  </body>
+</html>
