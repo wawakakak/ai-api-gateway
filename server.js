@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const crypto = require("crypto");
 const express = require("express");
 
 const app = express();
@@ -9,12 +10,48 @@ const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
 const QWEN_API_URL =
   "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
 
+const VIRTUAL_KEY_PREFIX = "sk-vclient-";
+const DEFAULT_BALANCE = 1_000_000;
+
+/** @type {Map<string, {balance: number, totalUsed: number, createdAt: Date}>} */
+const users = new Map();
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("Hello World! My first AI API service is running!");
 });
+
+function generateVirtualKey() {
+  return VIRTUAL_KEY_PREFIX + crypto.randomBytes(8).toString("hex");
+}
+
+function createUserRecord() {
+  return {
+    balance: DEFAULT_BALANCE,
+    totalUsed: 0,
+    createdAt: new Date(),
+  };
+}
+
+function authenticateVirtualKey(req, res, next) {
+  const authHeader = req.headers.authorization || "";
+  const match = authHeader.match(/^Bearer\s+(\S+)/i);
+  const virtualKey = match ? match[1] : "";
+  const user = virtualKey ? users.get(virtualKey) : undefined;
+
+  if (!user) {
+    return res.status(401).json({ error: "Invalid API Key" });
+  }
+
+  if (user.balance <= 0) {
+    return res.status(402).json({ error: "Insufficient balance" });
+  }
+
+  req.user = { key: virtualKey, record: user };
+  next();
+}
 
 function resolveChatMessages(body) {
   const { message, messages } = body;
@@ -27,7 +64,7 @@ function resolveChatMessages(body) {
   return null;
 }
 
-app.post("/chat", async (req, res) => {
+app.post("/chat", authenticateVirtualKey, async (req, res) => {
   const body = req.body || {};
   // Read model from JSON body first; fall back to query string for clients that
   // cannot send a JSON field. Normalize so "Qwen" / " qwen " still match.
@@ -96,11 +133,18 @@ app.post("/chat", async (req, res) => {
       });
     }
 
+    const totalTokens = Number(data?.usage?.total_tokens) || 0;
+    const record = req.user.record;
+    record.balance -= totalTokens;
+    record.totalUsed += totalTokens;
+
     const reply = data?.choices?.[0]?.message?.content ?? "";
     return res.json({
       reply,
       model: modelName,
       provider: providerName,
+      balance: record.balance,
+      totalUsed: record.totalUsed,
       raw: data,
     });
   } catch (error) {
@@ -109,6 +153,54 @@ app.post("/chat", async (req, res) => {
       details: error.message,
     });
   }
+});
+
+app.post("/admin/generate-key", (req, res) => {
+  const key = generateVirtualKey();
+  const record = createUserRecord();
+  users.set(key, record);
+  return res.json({
+    key,
+    balance: record.balance,
+  });
+});
+
+app.get("/admin/usage", (req, res) => {
+  const keys = [];
+  for (const [key, record] of users.entries()) {
+    keys.push({
+      key,
+      balance: record.balance,
+      totalUsed: record.totalUsed,
+      createdAt: record.createdAt,
+    });
+  }
+  return res.json({ keys, count: keys.length });
+});
+
+app.post("/admin/add-balance", (req, res) => {
+  const { key, amount } = req.body || {};
+
+  if (typeof key !== "string" || !key.trim()) {
+    return res.status(400).json({ error: 'Provide a "key" string.' });
+  }
+
+  const record = users.get(key);
+  if (!record) {
+    return res.status(401).json({ error: "Invalid API Key" });
+  }
+
+  const addAmount = Number(amount);
+  if (!Number.isFinite(addAmount) || addAmount <= 0) {
+    return res.status(400).json({ error: 'Provide a positive "amount".' });
+  }
+
+  record.balance += addAmount;
+  return res.json({
+    key,
+    balance: record.balance,
+    totalUsed: record.totalUsed,
+  });
 });
 
 app.listen(PORT, () => {
