@@ -4,30 +4,135 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AI API Gateway — AI API for 1/10th the Cost</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
-          extend: {
-            colors: {
-              ink: {
-                950: "#0b0d12",
-                900: "#11141b",
-                800: "#171b24",
-                700: "#1e2430",
-                600: "#2a3140",
-              },
-            },
-          },
-        },
-      };
-    </script>
     <style>
-      body {
-        word-wrap: break-word;
-        overflow-wrap: break-word;
+      /* Task 2: tech UI — base, aurora, grid */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
       }
 
+      html {
+        scroll-behavior: smooth;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+        background: #0a0a0f;
+        color: #94a3b8;
+        -webkit-font-smoothing: antialiased;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        position: relative;
+      }
+
+      .aurora {
+        position: fixed;
+        inset: -20%;
+        z-index: 0;
+        pointer-events: none;
+        background:
+          radial-gradient(ellipse 45% 40% at 22% 18%, rgba(6, 182, 212, 0.22), transparent 58%),
+          radial-gradient(ellipse 40% 35% at 78% 28%, rgba(37, 99, 235, 0.18), transparent 55%),
+          radial-gradient(ellipse 35% 30% at 50% 80%, rgba(14, 165, 233, 0.12), transparent 60%);
+        animation: auroraMove 22s ease-in-out infinite alternate;
+      }
+
+      @keyframes auroraMove {
+        0% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        100% {
+          transform: translate3d(6%, 5%, 0) scale(1.08);
+        }
+      }
+
+      .grid-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        background-image:
+          repeating-linear-gradient(
+            0deg,
+            rgba(255, 255, 255, 0.03) 0,
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px,
+            transparent 48px
+          ),
+          repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.03) 0,
+            rgba(255, 255, 255, 0.03) 1px,
+            transparent 1px,
+            transparent 48px
+          );
+      }
+
+      .page {
+        position: relative;
+        z-index: 1;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      /* Task 2: navbar */
+      .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: transparent;
+        border-bottom: 1px solid transparent;
+        transition: all 0.3s ease;
+      }
+
+      .site-header.scrolled {
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        max-width: 72rem;
+        margin: 0 auto;
+        padding: 1rem 1rem;
+      }
+
+      .brand {
+        font-size: 0.95rem;
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        color: #fff;
+        white-space: nowrap;
+      }
+
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.875rem;
+      }
+
+      .nav-link {
+        color: #94a3b8;
+        transition: color 0.2s ease;
+      }
+
+      .nav-link:hover {
+        color: #fff;
+      }
+
+      /* Task 1: i18n language switcher */
       .lang-switcher {
         position: relative;
       }
@@ -38,12 +143,12 @@
         gap: 0.35rem;
         min-height: 44px;
         padding: 0.4rem 0.75rem;
-        border-radius: 0.5rem;
-        border: 1px solid rgb(51 65 85 / 0.8);
-        background: rgb(17 20 27 / 0.9);
-        color: rgb(203 213 225);
+        border-radius: 0.65rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(12px);
+        color: #cbd5e1;
         font-size: 0.875rem;
-        line-height: 1.25rem;
         white-space: nowrap;
         cursor: pointer;
       }
@@ -51,21 +156,23 @@
       .lang-toggle:hover,
       .lang-switcher.open .lang-toggle {
         color: #fff;
-        border-color: rgb(34 211 238 / 0.45);
+        border-color: rgba(34, 211, 238, 0.45);
       }
 
       .lang-menu {
         display: none;
         position: absolute;
         right: 0;
-        top: calc(100% + 0.35rem);
-        min-width: 10.5rem;
-        padding: 0.35rem;
-        border-radius: 0.6rem;
-        border: 1px solid rgb(51 65 85 / 0.9);
-        background: #11141b;
-        box-shadow: 0 12px 32px rgb(0 0 0 / 0.35);
-        z-index: 30;
+        top: calc(100% + 0.4rem);
+        min-width: 11.5rem;
+        padding: 0.4rem;
+        border-radius: 0.9rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.88);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 24px rgba(6, 182, 212, 0.08);
+        z-index: 50;
       }
 
       .lang-switcher.open .lang-menu {
@@ -77,11 +184,11 @@
         width: 100%;
         min-height: 44px;
         align-items: center;
-        padding: 0.4rem 0.7rem;
+        padding: 0.4rem 0.75rem;
         border: 0;
-        border-radius: 0.45rem;
+        border-radius: 0.6rem;
         background: transparent;
-        color: rgb(203 213 225);
+        color: #cbd5e1;
         font-size: 0.875rem;
         text-align: left;
         cursor: pointer;
@@ -89,15 +196,484 @@
 
       .lang-option:hover,
       .lang-option[aria-selected="true"] {
-        background: rgb(30 36 48);
+        background: rgba(6, 182, 212, 0.12);
         color: #fff;
       }
 
+      /* Task 2: buttons */
+      .btn-primary,
+      .btn-secondary,
       .nav-cta,
       .hero-cta,
       .pricing-cta {
         min-height: 44px;
         box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.7rem;
+        font-weight: 600;
+        font-size: 0.875rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .btn-primary,
+      .nav-cta,
+      .hero-cta,
+      .pricing-cta.primary {
+        padding: 0.55rem 1.1rem;
+        border: 0;
+        color: #fff;
+        background: linear-gradient(to right, #06b6d4, #2563eb);
+      }
+
+      .btn-primary:hover,
+      .nav-cta:hover,
+      .hero-cta:hover,
+      .pricing-cta.primary:hover {
+        filter: brightness(1.12);
+        box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+      }
+
+      .btn-secondary,
+      .pricing-cta.secondary {
+        padding: 0.55rem 1.1rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: #e2e8f0;
+      }
+
+      .btn-secondary:hover,
+      .pricing-cta.secondary:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .hero-cta {
+        padding: 0.75rem 1.5rem;
+      }
+
+      /* Task 2: layout & type */
+      .wrap {
+        max-width: 72rem;
+        margin: 0 auto;
+        padding-left: 1rem;
+        padding-right: 1rem;
+      }
+
+      .hero {
+        padding: 4rem 1rem 4rem;
+        text-align: center;
+      }
+
+      .hero-eyebrow {
+        margin: 0;
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: rgba(34, 211, 238, 0.85);
+      }
+
+      .gradient-title {
+        background: linear-gradient(to right, #22d3ee, #3b82f6);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 0 40px rgba(6, 182, 212, 0.3);
+      }
+
+      .hero-title {
+        margin: 1rem 0 0;
+        font-size: 2.5rem;
+        font-weight: 650;
+        letter-spacing: -0.03em;
+        line-height: 1.15;
+      }
+
+      .hero-subtitle {
+        margin: 1.25rem auto 0;
+        max-width: 40rem;
+        font-size: 1.05rem;
+        line-height: 1.7;
+        color: #94a3b8;
+      }
+
+      .section {
+        padding: 0 1rem 5rem;
+      }
+
+      .section-head {
+        margin-bottom: 2rem;
+        text-align: center;
+      }
+
+      .pricing-heading {
+        margin: 0;
+        font-size: 1.875rem;
+        font-weight: 650;
+        letter-spacing: -0.03em;
+      }
+
+      .section-sub {
+        margin: 0.5rem 0 0;
+        font-size: 0.9rem;
+        color: #94a3b8;
+      }
+
+      .card-grid,
+      .pricing-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      /* Task 2: glass cards */
+      .glass-card {
+        position: relative;
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+      }
+
+      .glass-card:hover {
+        border-color: rgba(6, 182, 212, 0.3);
+        transform: translateY(-4px);
+        box-shadow: 0 20px 40px rgba(6, 182, 212, 0.1);
+      }
+
+      .card-title {
+        margin: 0;
+        font-size: 1.15rem;
+        font-weight: 600;
+        color: #e2e8f0;
+      }
+
+      .card-body {
+        margin: 0.75rem 0 0;
+        font-size: 0.9rem;
+        line-height: 1.7;
+        color: #94a3b8;
+      }
+
+      .price {
+        margin: 0.75rem 0 0;
+        font-size: 2.25rem;
+        font-weight: 650;
+        color: #f8fafc;
+      }
+
+      .price-unit {
+        font-size: 1.05rem;
+        font-weight: 500;
+        color: #94a3b8;
+      }
+
+      .feature-list {
+        margin: 1.25rem 0 0;
+        padding: 0;
+        list-style: none;
+        font-size: 0.9rem;
+        color: #94a3b8;
+      }
+
+      .feature-list li + li {
+        margin-top: 0.5rem;
+      }
+
+      .pricing-cta {
+        margin-top: 1.5rem;
+        width: 100%;
+      }
+
+      .popular-badge {
+        position: absolute;
+        top: -0.7rem;
+        right: 1rem;
+        padding: 0.28rem 0.7rem;
+        border-radius: 999px;
+        border: 1px solid rgba(34, 211, 238, 0.5);
+        background: rgba(34, 211, 238, 0.1);
+        color: #67e8f9;
+        font-size: 0.72rem;
+        font-weight: 600;
+        box-shadow: 0 0 16px rgba(34, 211, 238, 0.25);
+      }
+
+      .team-kicker {
+        margin: 0 0 0.4rem;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #67e8f9;
+      }
+
+      /* Task 2: section divider + dots */
+      .hr-glow {
+        height: 1px;
+        border: 0;
+        margin: 0 auto 3.5rem;
+        max-width: 72rem;
+        background: linear-gradient(to right, transparent, rgba(6, 182, 212, 0.2), transparent);
+      }
+
+      .dot {
+        position: absolute;
+        width: 4px;
+        height: 4px;
+        border-radius: 999px;
+        background: #22d3ee;
+        opacity: 0.5;
+        pointer-events: none;
+      }
+
+      .dot-tl {
+        top: 12px;
+        left: 12px;
+      }
+
+      .dot-br {
+        bottom: 12px;
+        right: 12px;
+      }
+
+      /* Task 2: scroll reveal */
+      .reveal {
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 600ms ease-out, transform 600ms ease-out;
+      }
+
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .delay-0 {
+        transition-delay: 0ms;
+      }
+
+      .delay-1 {
+        transition-delay: 100ms;
+      }
+
+      .delay-2 {
+        transition-delay: 200ms;
+      }
+
+      .site-footer {
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .footer-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        max-width: 72rem;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        font-size: 0.875rem;
+        color: #64748b;
+      }
+
+      /* Task 3: Telegram widget */
+      .tg-fab {
+        position: fixed;
+        right: 1.5rem;
+        bottom: 1.5rem;
+        z-index: 60;
+        width: 3.5rem;
+        height: 3.5rem;
+        border: 0;
+        border-radius: 999px;
+        background: #0088cc;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 10px 28px rgba(0, 136, 204, 0.35);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+      }
+
+      .tg-fab:hover {
+        transform: scale(1.1);
+        box-shadow: 0 14px 36px rgba(0, 136, 204, 0.5);
+      }
+
+      .tg-fab::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 999px;
+        background: #0088cc;
+        animation: tgPulse 2s ease-out infinite;
+        z-index: -1;
+      }
+
+      @keyframes tgPulse {
+        0% {
+          transform: scale(1);
+          opacity: 0.6;
+        }
+        100% {
+          transform: scale(2);
+          opacity: 0;
+        }
+      }
+
+      .tg-fab svg {
+        width: 1.45rem;
+        height: 1.45rem;
+        display: block;
+      }
+
+      .tg-panel {
+        position: fixed;
+        right: 1.5rem;
+        bottom: 6rem;
+        z-index: 61;
+        width: 18rem;
+        padding: 1.1rem 1.1rem 1.15rem;
+        border-radius: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(15, 23, 42, 0.9);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        box-shadow: 0 25px 50px rgba(0, 0, 0, 0.45);
+        opacity: 0;
+        transform: scale(0.95);
+        pointer-events: none;
+        transform-origin: bottom right;
+        transition: opacity 200ms ease, transform 200ms ease;
+      }
+
+      .tg-panel.open {
+        opacity: 1;
+        transform: scale(1);
+        pointer-events: auto;
+      }
+
+      .tg-panel-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.5rem;
+      }
+
+      .tg-title {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 650;
+        color: #f1f5f9;
+      }
+
+      .tg-sub {
+        margin: 0.35rem 0 0;
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+
+      .tg-close {
+        flex-shrink: 0;
+        width: 2rem;
+        height: 2rem;
+        border: 0;
+        border-radius: 0.5rem;
+        background: transparent;
+        color: #94a3b8;
+        font-size: 1.1rem;
+        cursor: pointer;
+      }
+
+      .tg-close:hover {
+        color: #fff;
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .tg-open {
+        margin-top: 1rem;
+        width: 100%;
+      }
+
+      .tg-mail {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.4rem;
+        margin-top: 0.55rem;
+        width: 100%;
+        min-height: 44px;
+        border-radius: 0.7rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: transparent;
+        color: #cbd5e1;
+        font-size: 0.8rem;
+        transition: background 0.2s ease;
+      }
+
+      .tg-mail:hover {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      @media (min-width: 640px) {
+        .nav,
+        .wrap,
+        .hero,
+        .section,
+        .footer-inner {
+          padding-left: 1.5rem;
+          padding-right: 1.5rem;
+        }
+
+        .hero {
+          padding-top: 6rem;
+        }
+
+        .hero-title {
+          font-size: 3.75rem;
+        }
+
+        .hero-subtitle {
+          font-size: 1.125rem;
+        }
+
+        .brand {
+          font-size: 1rem;
+        }
+
+        .nav-right {
+          gap: 1.25rem;
+        }
+
+        .footer-inner {
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+        }
+      }
+
+      @media (min-width: 769px) {
+        .card-grid,
+        .pricing-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+
+      @media (min-width: 1024px) {
+        .nav,
+        .wrap,
+        .hero,
+        .section,
+        .footer-inner {
+          padding-left: 2rem;
+          padding-right: 2rem;
+        }
       }
 
       @media (max-width: 768px) {
@@ -129,10 +705,23 @@
           width: 100%;
         }
 
-        .site-footer {
+        .footer-inner {
           flex-direction: column !important;
           align-items: center !important;
           text-align: center;
+        }
+
+        .glass-card:hover {
+          transform: translateY(-2px);
+        }
+
+        .reveal {
+          transform: translateY(16px);
+        }
+
+        .aurora {
+          opacity: 0.75;
+          animation-duration: 28s;
         }
 
         a,
@@ -144,210 +733,207 @@
         .hero-cta,
         .pricing-cta,
         .lang-toggle,
-        .lang-option {
+        .lang-option,
+        .tg-fab,
+        .tg-mail,
+        .tg-close {
           min-height: 44px;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .aurora,
+        .tg-fab::before,
+        .reveal {
+          animation: none;
+          transition: none;
+        }
+
+        .reveal {
+          opacity: 1;
+          transform: none;
         }
       }
     </style>
   </head>
-  <body class="min-h-screen bg-ink-950 text-slate-200 antialiased">
-    <header class="border-b border-slate-800/80 bg-ink-950/80 backdrop-blur">
-      <nav class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <a href="/" class="text-sm font-semibold tracking-tight text-white sm:text-base">
-          AI API Gateway
-        </a>
-        <div class="flex items-center gap-3 text-sm text-slate-400 sm:gap-5">
-          <a href="#pricing" class="nav-link transition hover:text-white" data-i18n="nav.pricing">Pricing</a>
-          <a href="#docs" class="nav-link transition hover:text-white" data-i18n="nav.docs">Docs</a>
-          <a href="/admin" class="nav-link transition hover:text-white" data-i18n="nav.dashboard">Dashboard</a>
-          <div class="lang-switcher" id="lang-switcher">
-            <button
-              type="button"
-              class="lang-toggle"
-              id="lang-toggle"
-              aria-haspopup="listbox"
-              aria-expanded="false"
-              aria-label="Language"
-            >
-              🌐 <span id="lang-toggle-label">English</span>
-            </button>
-            <div class="lang-menu" id="lang-menu" role="listbox" aria-labelledby="lang-toggle">
-              <button type="button" class="lang-option" role="option" data-lang="en" aria-selected="true">
-                🇺🇸 English
+  <body>
+    <div class="aurora" aria-hidden="true"></div>
+    <div class="grid-bg" aria-hidden="true"></div>
+    <div class="page">
+      <header class="site-header" id="site-header">
+        <nav class="nav">
+          <a href="/" class="brand">AI API Gateway</a>
+          <div class="nav-right">
+            <a href="#pricing" class="nav-link" data-i18n="nav.pricing">Pricing</a>
+            <a href="#docs" class="nav-link" data-i18n="nav.docs">Docs</a>
+            <a href="/admin" class="nav-link" data-i18n="nav.dashboard">Dashboard</a>
+            <a href="/admin" class="nav-cta" data-i18n="nav.getStarted">Get Started</a>
+            <div class="lang-switcher" id="lang-switcher">
+              <button
+                type="button"
+                class="lang-toggle"
+                id="lang-toggle"
+                aria-haspopup="listbox"
+                aria-expanded="false"
+                aria-label="Language"
+              >
+                🌐 <span id="lang-toggle-label">English</span>
               </button>
-              <button type="button" class="lang-option" role="option" data-lang="zh" aria-selected="false">
-                🇨🇳 中文
-              </button>
+              <div class="lang-menu" id="lang-menu" role="listbox" aria-labelledby="lang-toggle">
+                <button type="button" class="lang-option" role="option" data-lang="en" aria-selected="true">
+                  🇺🇸 English
+                </button>
+                <button type="button" class="lang-option" role="option" data-lang="ja" aria-selected="false">
+                  🇯🇵 日本語
+                </button>
+                <button type="button" class="lang-option" role="option" data-lang="ko" aria-selected="false">
+                  🇰🇷 한국어
+                </button>
+                <button type="button" class="lang-option" role="option" data-lang="fr" aria-selected="false">
+                  🇫🇷 Français
+                </button>
+                <button type="button" class="lang-option" role="option" data-lang="zh" aria-selected="false">
+                  🇨🇳 中文
+                </button>
+              </div>
             </div>
           </div>
-          <a
-            href="/admin"
-            class="nav-cta inline-flex items-center justify-center rounded-lg bg-cyan-500 px-3 py-1.5 font-semibold text-ink-950 transition hover:bg-cyan-400"
-            data-i18n="nav.getStarted"
-          >
-            Get Started
-          </a>
-        </div>
-      </nav>
-    </header>
+        </nav>
+      </header>
 
-    <main>
-      <section class="mx-auto max-w-6xl px-4 pb-16 pt-16 text-center sm:px-6 sm:pt-24 lg:px-8">
-        <p class="text-xs font-medium uppercase tracking-[0.25em] text-cyan-400/80" data-i18n="hero.eyebrow">
-          OpenAI-compatible gateway
-        </p>
-        <h1
-          class="hero-title mt-4 bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-4xl font-semibold tracking-tight text-transparent sm:text-6xl"
-          data-i18n="hero.title"
-        >
-          AI API for 1/10th the Cost
-        </h1>
-        <p class="hero-subtitle mx-auto mt-5 max-w-2xl text-base text-slate-400 sm:text-lg" data-i18n="hero.subtitle">
-          Drop-in replacement for OpenAI API. Same quality, fraction of the price.
-        </p>
-        <a
-          href="/admin"
-          class="hero-cta mt-8 inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500"
-          data-i18n="hero.cta"
-        >
-          Get Started
-        </a>
-      </section>
-
-      <section class="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-          <article
-            class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10"
-          >
-            <p class="text-sm font-medium text-cyan-400" data-i18n="features.compatible.kicker">OpenAI Compatible</p>
-            <h2 class="mt-2 text-xl font-semibold text-white" data-i18n="features.compatible.title">Change one line of code</h2>
-            <p class="mt-3 text-sm leading-6 text-slate-400" data-i18n="features.compatible.body">
-              Point your existing OpenAI SDK at our endpoint and keep the same request format.
-              Migration takes minutes, not weeks.
-            </p>
-          </article>
-          <article
-            class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10"
-          >
-            <p class="text-sm font-medium text-cyan-400" data-i18n="features.models.kicker">Multi-Model</p>
-            <h2 class="mt-2 text-xl font-semibold text-white" data-i18n="features.models.title">DeepSeek + Qwen + more</h2>
-            <p class="mt-3 text-sm leading-6 text-slate-400" data-i18n="features.models.body">
-              Route traffic across leading models from a single API. Pick the right quality
-              and cost for each request.
-            </p>
-          </article>
-          <article
-            class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10"
-          >
-            <p class="text-sm font-medium text-cyan-400" data-i18n="features.cdn.kicker">Global CDN</p>
-            <h2 class="mt-2 text-xl font-semibold text-white" data-i18n="features.cdn.title">Low latency, high availability</h2>
-            <p class="mt-3 text-sm leading-6 text-slate-400" data-i18n="features.cdn.body">
-              Serve completions close to your users with a globally distributed edge network
-              built for uptime.
-            </p>
-          </article>
-        </div>
-      </section>
-
-      <section id="pricing" class="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div class="mb-8 text-center">
-          <h2 class="text-3xl font-semibold tracking-tight text-white" data-i18n="pricing.heading">Pricing</h2>
-          <p class="mt-2 text-sm text-slate-400" data-i18n="pricing.subheading">Start free. Scale when your traffic grows.</p>
-        </div>
-        <div class="pricing-grid grid grid-cols-1 gap-4 md:grid-cols-3">
-          <article
-            class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-slate-600"
-          >
-            <h3 class="text-lg font-semibold text-white" data-i18n="pricing.free.title">Free</h3>
-            <p class="mt-3 text-4xl font-semibold text-white">$0</p>
-            <p class="mt-2 text-sm text-slate-400" data-i18n="pricing.free.description">100K tokens / month</p>
-            <ul class="mt-5 space-y-2 text-sm text-slate-400">
-              <li data-i18n="pricing.free.f1">OpenAI-compatible chat API</li>
-              <li data-i18n="pricing.free.f2">Community support</li>
-              <li data-i18n="pricing.free.f3">1 virtual API key</li>
-            </ul>
-            <a
-              href="/admin"
-              class="pricing-cta mt-6 inline-flex w-full items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-300"
-              data-i18n="pricing.free.cta"
-            >
-              Try it free
-            </a>
-          </article>
-          <article
-            class="relative rounded-xl border border-cyan-500/50 bg-ink-900 p-6 shadow-lg shadow-cyan-500/10 transition duration-200 hover:-translate-y-1 hover:border-cyan-400"
-          >
-            <span
-              class="absolute -top-3 right-4 rounded-full bg-cyan-500 px-2.5 py-1 text-xs font-semibold text-ink-950"
-              data-i18n="pricing.developer.badge"
-            >
-              Most Popular
-            </span>
-            <h3 class="text-lg font-semibold text-white" data-i18n="pricing.developer.title">Developer</h3>
-            <p class="mt-3 text-4xl font-semibold text-white">
-              $19<span class="text-lg font-medium text-slate-400" data-i18n="pricing.perMonth">/mo</span>
-            </p>
-            <p class="mt-2 text-sm text-slate-400" data-i18n="pricing.developer.description">1M tokens / month</p>
-            <ul class="mt-5 space-y-2 text-sm text-slate-400">
-              <li data-i18n="pricing.developer.f1">Everything in Free</li>
-              <li data-i18n="pricing.developer.f2">Email support</li>
-              <li data-i18n="pricing.developer.f3">Higher rate limits</li>
-            </ul>
-            <a
-              href="/admin"
-              class="pricing-cta mt-6 inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
-              data-i18n="pricing.developer.cta"
-            >
-              Get Started
-            </a>
-          </article>
-          <article
-            class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-slate-600"
-          >
-            <p class="text-xs font-medium uppercase tracking-wide text-cyan-400" data-i18n="pricing.team.badge">Best Value</p>
-            <h3 class="mt-2 text-lg font-semibold text-white" data-i18n="pricing.team.title">Team</h3>
-            <p class="mt-3 text-4xl font-semibold text-white">
-              $99<span class="text-lg font-medium text-slate-400" data-i18n="pricing.perMonth">/mo</span>
-            </p>
-            <p class="mt-2 text-sm text-slate-400" data-i18n="pricing.team.description">10M tokens / month</p>
-            <ul class="mt-5 space-y-2 text-sm text-slate-400">
-              <li data-i18n="pricing.team.f1">Everything in Developer</li>
-              <li data-i18n="pricing.team.f2">Priority support</li>
-              <li data-i18n="pricing.team.f3">Shared team usage and seats</li>
-            </ul>
-            <a
-              href="/admin"
-              class="pricing-cta mt-6 inline-flex w-full items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-300"
-              data-i18n="pricing.team.cta"
-            >
-              Contact sales
-            </a>
-          </article>
-        </div>
-      </section>
-
-      <section id="docs" class="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
-        <div class="rounded-xl border border-slate-800 bg-ink-900 p-6 sm:p-8">
-          <h2 class="text-xl font-semibold text-white" data-i18n="docs.heading">Docs</h2>
-          <p class="mt-2 text-sm leading-6 text-slate-400" data-i18n="docs.body">
-            Use your virtual key with the OpenAI-compatible chat endpoint. Set the base URL to
-            this gateway and send
-            Authorization: Bearer sk-vclient-... — upstream provider keys stay on the server.
+      <main>
+        <section class="hero wrap">
+          <p class="hero-eyebrow" data-i18n="hero.eyebrow">OPENAI-COMPATIBLE GATEWAY</p>
+          <h1 class="hero-title gradient-title" data-i18n="hero.title">AI API for 1/10th the Cost</h1>
+          <p class="hero-subtitle" data-i18n="hero.subtitle">
+            Drop-in replacement for OpenAI API. Same quality, fraction of the price.
           </p>
-        </div>
-      </section>
-    </main>
+          <a href="/admin" class="hero-cta" data-i18n="hero.cta">Get Started</a>
+        </section>
 
-    <footer class="border-t border-slate-800">
-      <div
-        class="site-footer mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"
-      >
-        <p data-i18n="footer.copyright">© 2026 AI API Gateway</p>
-        <p data-i18n="footer.contact">Contact: your-email@example.com</p>
+        <hr class="hr-glow wrap" />
+
+        <section class="section wrap">
+          <div class="card-grid">
+            <article class="glass-card reveal delay-0">
+              <span class="dot dot-tl" aria-hidden="true"></span>
+              <h2 class="card-title" data-i18n="features.compatible.title">OpenAI Compatible</h2>
+              <p class="card-body" data-i18n="features.compatible.body">Change base URL and key. Zero code changes.</p>
+            </article>
+            <article class="glass-card reveal delay-1">
+              <h2 class="card-title" data-i18n="features.models.title">Multi-Model</h2>
+              <p class="card-body" data-i18n="features.models.body">DeepSeek + Qwen + more. Auto-failover.</p>
+            </article>
+            <article class="glass-card reveal delay-2">
+              <span class="dot dot-br" aria-hidden="true"></span>
+              <h2 class="card-title" data-i18n="features.cdn.title">Global CDN</h2>
+              <p class="card-body" data-i18n="features.cdn.body">Low latency worldwide. 99.9% uptime.</p>
+            </article>
+          </div>
+        </section>
+
+        <hr class="hr-glow wrap" />
+
+        <section id="pricing" class="section wrap">
+          <div class="section-head">
+            <h2 class="pricing-heading gradient-title" data-i18n="pricing.heading">Pricing</h2>
+            <p class="section-sub" data-i18n="pricing.subheading">Start free. Scale when your traffic grows.</p>
+          </div>
+          <div class="pricing-grid">
+            <article class="glass-card reveal delay-0">
+              <h3 class="card-title" data-i18n="pricing.free.title">Free</h3>
+              <p class="price">$0</p>
+              <p class="card-body" data-i18n="pricing.free.description">100K tokens</p>
+              <ul class="feature-list">
+                <li data-i18n="pricing.free.f1">OpenAI-compatible chat API</li>
+                <li data-i18n="pricing.free.f2">Community support</li>
+                <li data-i18n="pricing.free.f3">1 virtual API key</li>
+              </ul>
+              <a href="/admin" class="pricing-cta secondary" data-i18n="pricing.free.cta">Get Started</a>
+            </article>
+            <article class="glass-card reveal delay-1">
+              <span class="popular-badge" data-i18n="pricing.developer.badge">Most Popular</span>
+              <h3 class="card-title" data-i18n="pricing.developer.title">Developer</h3>
+              <p class="price">
+                $19<span class="price-unit" data-i18n="pricing.perMonth">/mo</span>
+              </p>
+              <p class="card-body" data-i18n="pricing.developer.description">1M tokens</p>
+              <ul class="feature-list">
+                <li data-i18n="pricing.developer.f1">Everything in Free</li>
+                <li data-i18n="pricing.developer.f2">Email support</li>
+                <li data-i18n="pricing.developer.f3">Higher rate limits</li>
+              </ul>
+              <a href="/admin" class="pricing-cta primary" data-i18n="pricing.developer.cta">Get Started</a>
+            </article>
+            <article class="glass-card reveal delay-2">
+              <p class="team-kicker" data-i18n="pricing.team.badge">Best Value</p>
+              <h3 class="card-title" data-i18n="pricing.team.title">Team</h3>
+              <p class="price">
+                $99<span class="price-unit" data-i18n="pricing.perMonth">/mo</span>
+              </p>
+              <p class="card-body" data-i18n="pricing.team.description">10M tokens</p>
+              <ul class="feature-list">
+                <li data-i18n="pricing.team.f1">Everything in Developer</li>
+                <li data-i18n="pricing.team.f2">Priority support</li>
+                <li data-i18n="pricing.team.f3">Shared team usage and seats</li>
+              </ul>
+              <a href="/admin" class="pricing-cta secondary" data-i18n="pricing.team.cta">Contact Sales</a>
+            </article>
+          </div>
+        </section>
+
+        <hr class="hr-glow wrap" />
+
+        <section id="docs" class="section wrap">
+          <article class="glass-card">
+            <h2 class="card-title" data-i18n="docs.heading">Docs</h2>
+            <p class="card-body" data-i18n="docs.body">
+              Use your virtual key with the OpenAI-compatible chat endpoint. Set the base URL to
+              this gateway and send Authorization: Bearer sk-vclient-... — upstream provider keys stay on the server.
+            </p>
+          </article>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <div class="footer-inner">
+          <p data-i18n="footer.copyright">© 2026 AI API Gateway</p>
+          <p data-i18n="footer.contact">Contact: kenji618@163.com</p>
+        </div>
+      </footer>
+    </div>
+
+    <!-- Task 3: Telegram chat widget -->
+    <div class="tg-panel" id="tg-panel" role="dialog" aria-labelledby="tg-title" aria-hidden="true">
+      <div class="tg-panel-head">
+        <div>
+          <p class="tg-title" id="tg-title" data-i18n="telegram.title">💬 Live Support</p>
+          <p class="tg-sub" data-i18n="telegram.subtitle">We typically reply in minutes</p>
+        </div>
+        <button type="button" class="tg-close" id="tg-close" aria-label="Close">×</button>
       </div>
-    </footer>
+      <a
+        class="btn-primary tg-open"
+        href="https://t.me/bingo16688"
+        target="_blank"
+        rel="noopener noreferrer"
+        data-i18n="telegram.open"
+      >
+        Open in Telegram
+      </a>
+      <a class="tg-mail" href="mailto:kenji618@163.com">📧 kenji618@163.com</a>
+    </div>
+    <button type="button" class="tg-fab" id="tg-fab" aria-label="Open Telegram support" aria-expanded="false">
+      <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path
+          d="M21.5 3.5 2.8 10.7c-1.3.5-1.3 1.2-.2 1.5l4.8 1.5 11.1-7c.5-.3.9-.1.6.2l-9 8.2-.3 4.8c.5 0 .7-.2 1-.5l2.3-2.3 4.8 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.4-1.5Z"
+          fill="white"
+        />
+      </svg>
+    </button>
 
     <script>
+      /* Task 1: i18n */
       const translations = {
         en: {
           nav: {
@@ -357,26 +943,23 @@
             getStarted: "Get Started",
           },
           hero: {
-            eyebrow: "OpenAI-compatible gateway",
+            eyebrow: "OPENAI-COMPATIBLE GATEWAY",
             title: "AI API for 1/10th the Cost",
             subtitle: "Drop-in replacement for OpenAI API. Same quality, fraction of the price.",
             cta: "Get Started",
           },
           features: {
             compatible: {
-              kicker: "OpenAI Compatible",
-              title: "Change one line of code",
-              body: "Point your existing OpenAI SDK at our endpoint and keep the same request format. Migration takes minutes, not weeks.",
+              title: "OpenAI Compatible",
+              body: "Change base URL and key. Zero code changes.",
             },
             models: {
-              kicker: "Multi-Model",
-              title: "DeepSeek + Qwen + more",
-              body: "Route traffic across leading models from a single API. Pick the right quality and cost for each request.",
+              title: "Multi-Model",
+              body: "DeepSeek + Qwen + more. Auto-failover.",
             },
             cdn: {
-              kicker: "Global CDN",
-              title: "Low latency, high availability",
-              body: "Serve completions close to your users with a globally distributed edge network built for uptime.",
+              title: "Global CDN",
+              body: "Low latency worldwide. 99.9% uptime.",
             },
           },
           pricing: {
@@ -385,16 +968,16 @@
             perMonth: "/mo",
             free: {
               title: "Free",
-              description: "100K tokens / month",
+              description: "100K tokens",
               f1: "OpenAI-compatible chat API",
               f2: "Community support",
               f3: "1 virtual API key",
-              cta: "Try it free",
+              cta: "Get Started",
             },
             developer: {
               badge: "Most Popular",
               title: "Developer",
-              description: "1M tokens / month",
+              description: "1M tokens",
               f1: "Everything in Free",
               f2: "Email support",
               f3: "Higher rate limits",
@@ -403,11 +986,11 @@
             team: {
               badge: "Best Value",
               title: "Team",
-              description: "10M tokens / month",
+              description: "10M tokens",
               f1: "Everything in Developer",
               f2: "Priority support",
               f3: "Shared team usage and seats",
-              cta: "Contact sales",
+              cta: "Contact Sales",
             },
           },
           docs: {
@@ -416,7 +999,12 @@
           },
           footer: {
             copyright: "© 2026 AI API Gateway",
-            contact: "Contact: your-email@example.com",
+            contact: "Contact: kenji618@163.com",
+          },
+          telegram: {
+            title: "💬 Live Support",
+            subtitle: "We typically reply in minutes",
+            open: "Open in Telegram",
           },
           lang: {
             label: "English",
@@ -430,26 +1018,23 @@
             getStarted: "立即开始",
           },
           hero: {
-            eyebrow: "兼容 OpenAI 的网关",
+            eyebrow: "兼容 OPENAI 的网关",
             title: "成本仅有十分之一的 AI API",
             subtitle: "OpenAI API 的即插即用替代方案。同等质量，价格仅有零头。",
             cta: "立即开始",
           },
           features: {
             compatible: {
-              kicker: "兼容 OpenAI",
-              title: "只需改一行代码",
-              body: "把现有 OpenAI SDK 的请求地址指向本网关，请求格式保持不变。迁移只需几分钟，而不是几周。",
+              title: "兼容 OpenAI",
+              body: "只需改一行代码。把现有 OpenAI SDK 的请求地址指向本网关，请求格式保持不变。迁移只需几分钟，而不是几周。",
             },
             models: {
-              kicker: "多模型",
-              title: "DeepSeek + 通义千问等",
-              body: "通过单一 API 在主流模型之间调度流量，为每个请求选择合适的质量与成本。",
+              title: "多模型",
+              body: "DeepSeek + 通义千问等。通过单一 API 在主流模型之间调度流量，为每个请求选择合适的质量与成本。",
             },
             cdn: {
-              kicker: "全球 CDN",
-              title: "低延迟，高可用",
-              body: "通过全球分布式边缘网络就近提供补全服务，专为稳定在线而设计。",
+              title: "全球 CDN",
+              body: "低延迟，高可用。通过全球分布式边缘网络就近提供补全服务，专为稳定在线而设计。",
             },
           },
           pricing: {
@@ -489,10 +1074,240 @@
           },
           footer: {
             copyright: "© 2026 AI API Gateway",
-            contact: "联系：your-email@example.com",
+            contact: "联系：kenji618@163.com",
+          },
+          telegram: {
+            title: "💬 实时支持",
+            subtitle: "通常几分钟内回复",
+            open: "在 Telegram 打开",
           },
           lang: {
             label: "中文",
+          },
+        },
+        ja: {
+          nav: {
+            pricing: "料金",
+            docs: "ドキュメント",
+            dashboard: "ダッシュボード",
+            getStarted: "始める",
+          },
+          hero: {
+            eyebrow: "OPENAI互換ゲートウェイ",
+            title: "OpenAI API の 1/10 のコストで AI API",
+            subtitle: "OpenAI API の即座の代替品。同じ品質、圧倒的な低価格。",
+            cta: "始める",
+          },
+          features: {
+            compatible: {
+              title: "OpenAI互換",
+              body: "ベースURLとキーを変更するだけ。コード変更ゼロ。",
+            },
+            models: {
+              title: "マルチモデル",
+              body: "DeepSeek + Qwen など。自動フェイルオーバー。",
+            },
+            cdn: {
+              title: "グローバルCDN",
+              body: "世界中で低遅延。99.9%の稼働率。",
+            },
+          },
+          pricing: {
+            heading: "料金",
+            subheading: "無料で始めて、トラフィックに合わせて拡張。",
+            perMonth: "/月",
+            free: {
+              title: "無料",
+              description: "10万トークン",
+              f1: "OpenAI互換チャットAPI",
+              f2: "コミュニティサポート",
+              f3: "仮想APIキー 1本",
+              cta: "始める",
+            },
+            developer: {
+              badge: "人気",
+              title: "開発者",
+              description: "100万トークン",
+              f1: "無料プランの全機能",
+              f2: "メールサポート",
+              f3: "より高いレート制限",
+              cta: "始める",
+            },
+            team: {
+              badge: "お得",
+              title: "チーム",
+              description: "1000万トークン",
+              f1: "開発者プランの全機能",
+              f2: "優先サポート",
+              f3: "チーム利用量とシート共有",
+              cta: "営業に問い合わせ",
+            },
+          },
+          docs: {
+            heading: "ドキュメント",
+            body: "仮想キーを使って OpenAI 互換のチャットエンドポイントを呼び出します。ベースURLをこのゲートウェイに設定し、Authorization: Bearer sk-vclient-... を送信してください。上流プロバイダーのキーはサーバー側に残ります。",
+          },
+          footer: {
+            copyright: "© 2026 AI API Gateway",
+            contact: "お問い合わせ: kenji618@163.com",
+          },
+          telegram: {
+            title: "💬 ライブサポート",
+            subtitle: "通常数分以内に返信します",
+            open: "Telegramで開く",
+          },
+          lang: {
+            label: "日本語",
+          },
+        },
+        ko: {
+          nav: {
+            pricing: "가격",
+            docs: "문서",
+            dashboard: "대시보드",
+            getStarted: "시작하기",
+          },
+          hero: {
+            eyebrow: "OpenAI 호환 게이트웨이",
+            title: "OpenAI API의 1/10 비용으로 AI API",
+            subtitle: "OpenAI API의 드롭인 대체품. 동일한 품질, 훨씬 저렴한 가격.",
+            cta: "시작하기",
+          },
+          features: {
+            compatible: {
+              title: "OpenAI 호환",
+              body: "베이스 URL과 키만 변경. 코드 변경 없음.",
+            },
+            models: {
+              title: "멀티 모델",
+              body: "DeepSeek + Qwen 등. 자동 장애 조치.",
+            },
+            cdn: {
+              title: "글로벌 CDN",
+              body: "전 세계 저지연. 99.9% 가동 시간.",
+            },
+          },
+          pricing: {
+            heading: "가격",
+            subheading: "무료로 시작하고, 트래픽이 늘면 확장하세요.",
+            perMonth: "/월",
+            free: {
+              title: "무료",
+              description: "10만 토큰",
+              f1: "OpenAI 호환 채팅 API",
+              f2: "커뮤니티 지원",
+              f3: "가상 API 키 1개",
+              cta: "시작하기",
+            },
+            developer: {
+              badge: "인기",
+              title: "개발자",
+              description: "100만 토큰",
+              f1: "무료 플랜의 모든 기능",
+              f2: "이메일 지원",
+              f3: "더 높은 요청 한도",
+              cta: "시작하기",
+            },
+            team: {
+              badge: "최고 가치",
+              title: "팀",
+              description: "1000만 토큰",
+              f1: "개발자 플랜의 모든 기능",
+              f2: "우선 지원",
+              f3: "팀 사용량 및 좌석 공유",
+              cta: "영업 문의",
+            },
+          },
+          docs: {
+            heading: "문서",
+            body: "가상 키로 OpenAI 호환 채팅 엔드포인트를 사용하세요. 베이스 URL을 이 게이트웨이로 설정하고 Authorization: Bearer sk-vclient-... 를 전송하세요. 업스트림 공급자 키는 서버에 남습니다.",
+          },
+          footer: {
+            copyright: "© 2026 AI API Gateway",
+            contact: "문의: kenji618@163.com",
+          },
+          telegram: {
+            title: "💬 실시간 지원",
+            subtitle: "보통 몇 분 내에 답변합니다",
+            open: "Telegram에서 열기",
+          },
+          lang: {
+            label: "한국어",
+          },
+        },
+        fr: {
+          nav: {
+            pricing: "Tarifs",
+            docs: "Docs",
+            dashboard: "Tableau de bord",
+            getStarted: "Commencer",
+          },
+          hero: {
+            eyebrow: "PASSERELLE COMPATIBLE OPENAI",
+            title: "API IA pour 1/10 du coût",
+            subtitle: "Remplacement direct de l'API OpenAI. Même qualité, prix réduit.",
+            cta: "Commencer",
+          },
+          features: {
+            compatible: {
+              title: "Compatible OpenAI",
+              body: "Changez l'URL de base et la clé. Zéro modification de code.",
+            },
+            models: {
+              title: "Multi-modèle",
+              body: "DeepSeek + Qwen et plus. Basculement auto.",
+            },
+            cdn: {
+              title: "CDN mondial",
+              body: "Faible latence mondiale. 99,9% de disponibilité.",
+            },
+          },
+          pricing: {
+            heading: "Tarifs",
+            subheading: "Commencez gratuitement. Évoluez avec votre trafic.",
+            perMonth: "/mois",
+            free: {
+              title: "Gratuit",
+              description: "100K jetons",
+              f1: "API chat compatible OpenAI",
+              f2: "Support communautaire",
+              f3: "1 clé API virtuelle",
+              cta: "Commencer",
+            },
+            developer: {
+              badge: "Populaire",
+              title: "Développeur",
+              description: "1M jetons",
+              f1: "Tout le plan Gratuit",
+              f2: "Support par e-mail",
+              f3: "Limites de débit plus élevées",
+              cta: "Commencer",
+            },
+            team: {
+              badge: "Meilleure valeur",
+              title: "Équipe",
+              description: "10M jetons",
+              f1: "Tout le plan Développeur",
+              f2: "Support prioritaire",
+              f3: "Usage et sièges d'équipe partagés",
+              cta: "Contacter les ventes",
+            },
+          },
+          docs: {
+            heading: "Docs",
+            body: "Utilisez votre clé virtuelle avec l'endpoint chat compatible OpenAI. Définissez l'URL de base sur cette passerelle et envoyez Authorization: Bearer sk-vclient-... — les clés des fournisseurs amont restent sur le serveur.",
+          },
+          footer: {
+            copyright: "© 2026 AI API Gateway",
+            contact: "Contact : kenji618@163.com",
+          },
+          telegram: {
+            title: "💬 Support en direct",
+            subtitle: "Nous répondons généralement en quelques minutes",
+            open: "Ouvrir dans Telegram",
+          },
+          lang: {
+            label: "Français",
           },
         },
       };
@@ -527,7 +1342,7 @@
         var switcher = document.getElementById("lang-switcher");
         var toggle = document.getElementById("lang-toggle");
         var saved = localStorage.getItem("lang");
-        applyLanguage(saved === "zh" ? "zh" : "en");
+        applyLanguage(translations[saved] ? saved : "en");
 
         function setOpen(open) {
           switcher.classList.toggle("open", open);
@@ -545,6 +1360,75 @@
             applyLanguage(option.getAttribute("data-lang"));
             setOpen(false);
           });
+        });
+
+        document.addEventListener("click", function () {
+          setOpen(false);
+        });
+
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            setOpen(false);
+          }
+        });
+      })();
+
+      /* Task 2: navbar scroll + IntersectionObserver reveal */
+      (function initUi() {
+        var header = document.getElementById("site-header");
+        function onScroll() {
+          header.classList.toggle("scrolled", window.scrollY > 50);
+        }
+        onScroll();
+        window.addEventListener("scroll", onScroll, { passive: true });
+
+        var cards = document.querySelectorAll(".reveal");
+        if ("IntersectionObserver" in window) {
+          var observer = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  entry.target.classList.add("visible");
+                  observer.unobserve(entry.target);
+                }
+              });
+            },
+            { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+          );
+          cards.forEach(function (card) {
+            observer.observe(card);
+          });
+        } else {
+          cards.forEach(function (card) {
+            card.classList.add("visible");
+          });
+        }
+      })();
+
+      /* Task 3: Telegram widget */
+      (function initTelegram() {
+        var fab = document.getElementById("tg-fab");
+        var panel = document.getElementById("tg-panel");
+        var closeBtn = document.getElementById("tg-close");
+
+        function setOpen(open) {
+          panel.classList.toggle("open", open);
+          panel.setAttribute("aria-hidden", open ? "false" : "true");
+          fab.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+
+        fab.addEventListener("click", function (event) {
+          event.stopPropagation();
+          setOpen(!panel.classList.contains("open"));
+        });
+
+        closeBtn.addEventListener("click", function (event) {
+          event.stopPropagation();
+          setOpen(false);
+        });
+
+        panel.addEventListener("click", function (event) {
+          event.stopPropagation();
         });
 
         document.addEventListener("click", function () {
