@@ -22,6 +22,133 @@
         },
       };
     </script>
+    <style>
+      body {
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+
+      .lang-switcher {
+        position: relative;
+      }
+
+      .lang-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        min-height: 44px;
+        padding: 0.4rem 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid rgb(51 65 85 / 0.8);
+        background: rgb(17 20 27 / 0.9);
+        color: rgb(203 213 225);
+        font-size: 0.875rem;
+        line-height: 1.25rem;
+        white-space: nowrap;
+        cursor: pointer;
+      }
+
+      .lang-toggle:hover,
+      .lang-switcher.open .lang-toggle {
+        color: #fff;
+        border-color: rgb(34 211 238 / 0.45);
+      }
+
+      .lang-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: calc(100% + 0.35rem);
+        min-width: 10.5rem;
+        padding: 0.35rem;
+        border-radius: 0.6rem;
+        border: 1px solid rgb(51 65 85 / 0.9);
+        background: #11141b;
+        box-shadow: 0 12px 32px rgb(0 0 0 / 0.35);
+        z-index: 30;
+      }
+
+      .lang-switcher.open .lang-menu {
+        display: block;
+      }
+
+      .lang-option {
+        display: flex;
+        width: 100%;
+        min-height: 44px;
+        align-items: center;
+        padding: 0.4rem 0.7rem;
+        border: 0;
+        border-radius: 0.45rem;
+        background: transparent;
+        color: rgb(203 213 225);
+        font-size: 0.875rem;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .lang-option:hover,
+      .lang-option[aria-selected="true"] {
+        background: rgb(30 36 48);
+        color: #fff;
+      }
+
+      .nav-cta,
+      .hero-cta,
+      .pricing-cta {
+        min-height: 44px;
+        box-sizing: border-box;
+      }
+
+      @media (max-width: 768px) {
+        .nav-link {
+          display: none !important;
+        }
+
+        .hero-title {
+          font-size: 1.5rem !important;
+          line-height: 2rem !important;
+        }
+
+        .hero-subtitle {
+          font-size: 1.125rem !important;
+          line-height: 1.75rem !important;
+        }
+
+        .hero-cta {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .pricing-grid {
+          display: flex !important;
+          flex-direction: column;
+        }
+
+        .pricing-grid > * {
+          width: 100%;
+        }
+
+        .site-footer {
+          flex-direction: column !important;
+          align-items: center !important;
+          text-align: center;
+        }
+
+        a,
+        button,
+        input,
+        select,
+        textarea,
+        .nav-cta,
+        .hero-cta,
+        .pricing-cta,
+        .lang-toggle,
+        .lang-option {
+          min-height: 44px;
+        }
+      }
+    </style>
   </head>
   <body class="min-h-screen bg-ink-950 text-slate-200 antialiased">
     <header class="border-b border-slate-800/80 bg-ink-950/80 backdrop-blur">
@@ -29,11 +156,36 @@
         <a href="/" class="text-sm font-semibold tracking-tight text-white sm:text-base">
           AI API Gateway
         </a>
-        <div class="flex items-center gap-4 text-sm text-slate-400 sm:gap-6">
-          <a href="#pricing" class="transition hover:text-white">Pricing</a>
-          <a href="#docs" class="transition hover:text-white">Docs</a>
-          <a href="/admin" class="rounded-lg bg-cyan-500 px-3 py-1.5 font-semibold text-ink-950 transition hover:bg-cyan-400">
-            Dashboard
+        <div class="flex items-center gap-3 text-sm text-slate-400 sm:gap-5">
+          <a href="#pricing" class="nav-link transition hover:text-white" data-i18n="nav.pricing">Pricing</a>
+          <a href="#docs" class="nav-link transition hover:text-white" data-i18n="nav.docs">Docs</a>
+          <a href="/admin" class="nav-link transition hover:text-white" data-i18n="nav.dashboard">Dashboard</a>
+          <div class="lang-switcher" id="lang-switcher">
+            <button
+              type="button"
+              class="lang-toggle"
+              id="lang-toggle"
+              aria-haspopup="listbox"
+              aria-expanded="false"
+              aria-label="Language"
+            >
+              🌐 <span id="lang-toggle-label">English</span>
+            </button>
+            <div class="lang-menu" id="lang-menu" role="listbox" aria-labelledby="lang-toggle">
+              <button type="button" class="lang-option" role="option" data-lang="en" aria-selected="true">
+                🇺🇸 English
+              </button>
+              <button type="button" class="lang-option" role="option" data-lang="zh" aria-selected="false">
+                🇨🇳 中文
+              </button>
+            </div>
+          </div>
+          <a
+            href="/admin"
+            class="nav-cta inline-flex items-center justify-center rounded-lg bg-cyan-500 px-3 py-1.5 font-semibold text-ink-950 transition hover:bg-cyan-400"
+            data-i18n="nav.getStarted"
+          >
+            Get Started
           </a>
         </div>
       </nav>
@@ -41,20 +193,22 @@
 
     <main>
       <section class="mx-auto max-w-6xl px-4 pb-16 pt-16 text-center sm:px-6 sm:pt-24 lg:px-8">
-        <p class="text-xs font-medium uppercase tracking-[0.25em] text-cyan-400/80">
+        <p class="text-xs font-medium uppercase tracking-[0.25em] text-cyan-400/80" data-i18n="hero.eyebrow">
           OpenAI-compatible gateway
         </p>
         <h1
-          class="mt-4 bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-4xl font-semibold tracking-tight text-transparent sm:text-6xl"
+          class="hero-title mt-4 bg-gradient-to-r from-cyan-300 via-sky-400 to-blue-500 bg-clip-text text-4xl font-semibold tracking-tight text-transparent sm:text-6xl"
+          data-i18n="hero.title"
         >
           AI API for 1/10th the Cost
         </h1>
-        <p class="mx-auto mt-5 max-w-2xl text-base text-slate-400 sm:text-lg">
+        <p class="hero-subtitle mx-auto mt-5 max-w-2xl text-base text-slate-400 sm:text-lg" data-i18n="hero.subtitle">
           Drop-in replacement for OpenAI API. Same quality, fraction of the price.
         </p>
         <a
           href="/admin"
-          class="mt-8 inline-flex rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500"
+          class="hero-cta mt-8 inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:-translate-y-0.5 hover:bg-blue-500"
+          data-i18n="hero.cta"
         >
           Get Started
         </a>
@@ -65,9 +219,9 @@
           <article
             class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10"
           >
-            <p class="text-sm font-medium text-cyan-400">OpenAI Compatible</p>
-            <h2 class="mt-2 text-xl font-semibold text-white">Change one line of code</h2>
-            <p class="mt-3 text-sm leading-6 text-slate-400">
+            <p class="text-sm font-medium text-cyan-400" data-i18n="features.compatible.kicker">OpenAI Compatible</p>
+            <h2 class="mt-2 text-xl font-semibold text-white" data-i18n="features.compatible.title">Change one line of code</h2>
+            <p class="mt-3 text-sm leading-6 text-slate-400" data-i18n="features.compatible.body">
               Point your existing OpenAI SDK at our endpoint and keep the same request format.
               Migration takes minutes, not weeks.
             </p>
@@ -75,9 +229,9 @@
           <article
             class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10"
           >
-            <p class="text-sm font-medium text-cyan-400">Multi-Model</p>
-            <h2 class="mt-2 text-xl font-semibold text-white">DeepSeek + Qwen + more</h2>
-            <p class="mt-3 text-sm leading-6 text-slate-400">
+            <p class="text-sm font-medium text-cyan-400" data-i18n="features.models.kicker">Multi-Model</p>
+            <h2 class="mt-2 text-xl font-semibold text-white" data-i18n="features.models.title">DeepSeek + Qwen + more</h2>
+            <p class="mt-3 text-sm leading-6 text-slate-400" data-i18n="features.models.body">
               Route traffic across leading models from a single API. Pick the right quality
               and cost for each request.
             </p>
@@ -85,9 +239,9 @@
           <article
             class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-500/10"
           >
-            <p class="text-sm font-medium text-cyan-400">Global CDN</p>
-            <h2 class="mt-2 text-xl font-semibold text-white">Low latency, high availability</h2>
-            <p class="mt-3 text-sm leading-6 text-slate-400">
+            <p class="text-sm font-medium text-cyan-400" data-i18n="features.cdn.kicker">Global CDN</p>
+            <h2 class="mt-2 text-xl font-semibold text-white" data-i18n="features.cdn.title">Low latency, high availability</h2>
+            <p class="mt-3 text-sm leading-6 text-slate-400" data-i18n="features.cdn.body">
               Serve completions close to your users with a globally distributed edge network
               built for uptime.
             </p>
@@ -97,19 +251,25 @@
 
       <section id="pricing" class="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
         <div class="mb-8 text-center">
-          <h2 class="text-3xl font-semibold tracking-tight text-white">Pricing</h2>
-          <p class="mt-2 text-sm text-slate-400">Start free. Scale when your traffic grows.</p>
+          <h2 class="text-3xl font-semibold tracking-tight text-white" data-i18n="pricing.heading">Pricing</h2>
+          <p class="mt-2 text-sm text-slate-400" data-i18n="pricing.subheading">Start free. Scale when your traffic grows.</p>
         </div>
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div class="pricing-grid grid grid-cols-1 gap-4 md:grid-cols-3">
           <article
             class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-slate-600"
           >
-            <h3 class="text-lg font-semibold text-white">Free</h3>
+            <h3 class="text-lg font-semibold text-white" data-i18n="pricing.free.title">Free</h3>
             <p class="mt-3 text-4xl font-semibold text-white">$0</p>
-            <p class="mt-2 text-sm text-slate-400">100K tokens</p>
+            <p class="mt-2 text-sm text-slate-400" data-i18n="pricing.free.description">100K tokens / month</p>
+            <ul class="mt-5 space-y-2 text-sm text-slate-400">
+              <li data-i18n="pricing.free.f1">OpenAI-compatible chat API</li>
+              <li data-i18n="pricing.free.f2">Community support</li>
+              <li data-i18n="pricing.free.f3">1 virtual API key</li>
+            </ul>
             <a
               href="/admin"
-              class="mt-6 inline-flex w-full justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-300"
+              class="pricing-cta mt-6 inline-flex w-full items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-300"
+              data-i18n="pricing.free.cta"
             >
               Try it free
             </a>
@@ -119,17 +279,24 @@
           >
             <span
               class="absolute -top-3 right-4 rounded-full bg-cyan-500 px-2.5 py-1 text-xs font-semibold text-ink-950"
+              data-i18n="pricing.developer.badge"
             >
               Most Popular
             </span>
-            <h3 class="text-lg font-semibold text-white">Developer</h3>
+            <h3 class="text-lg font-semibold text-white" data-i18n="pricing.developer.title">Developer</h3>
             <p class="mt-3 text-4xl font-semibold text-white">
-              $19<span class="text-lg font-medium text-slate-400">/mo</span>
+              $19<span class="text-lg font-medium text-slate-400" data-i18n="pricing.perMonth">/mo</span>
             </p>
-            <p class="mt-2 text-sm text-slate-400">1M tokens</p>
+            <p class="mt-2 text-sm text-slate-400" data-i18n="pricing.developer.description">1M tokens / month</p>
+            <ul class="mt-5 space-y-2 text-sm text-slate-400">
+              <li data-i18n="pricing.developer.f1">Everything in Free</li>
+              <li data-i18n="pricing.developer.f2">Email support</li>
+              <li data-i18n="pricing.developer.f3">Higher rate limits</li>
+            </ul>
             <a
               href="/admin"
-              class="mt-6 inline-flex w-full justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
+              class="pricing-cta mt-6 inline-flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-500"
+              data-i18n="pricing.developer.cta"
             >
               Get Started
             </a>
@@ -137,15 +304,21 @@
           <article
             class="rounded-xl border border-slate-800 bg-ink-900 p-6 transition duration-200 hover:-translate-y-1 hover:border-slate-600"
           >
-            <p class="text-xs font-medium uppercase tracking-wide text-cyan-400">Best Value</p>
-            <h3 class="mt-2 text-lg font-semibold text-white">Team</h3>
+            <p class="text-xs font-medium uppercase tracking-wide text-cyan-400" data-i18n="pricing.team.badge">Best Value</p>
+            <h3 class="mt-2 text-lg font-semibold text-white" data-i18n="pricing.team.title">Team</h3>
             <p class="mt-3 text-4xl font-semibold text-white">
-              $99<span class="text-lg font-medium text-slate-400">/mo</span>
+              $99<span class="text-lg font-medium text-slate-400" data-i18n="pricing.perMonth">/mo</span>
             </p>
-            <p class="mt-2 text-sm text-slate-400">10M tokens</p>
+            <p class="mt-2 text-sm text-slate-400" data-i18n="pricing.team.description">10M tokens / month</p>
+            <ul class="mt-5 space-y-2 text-sm text-slate-400">
+              <li data-i18n="pricing.team.f1">Everything in Developer</li>
+              <li data-i18n="pricing.team.f2">Priority support</li>
+              <li data-i18n="pricing.team.f3">Shared team usage and seats</li>
+            </ul>
             <a
               href="/admin"
-              class="mt-6 inline-flex w-full justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-300"
+              class="pricing-cta mt-6 inline-flex w-full items-center justify-center rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 transition hover:border-cyan-500 hover:text-cyan-300"
+              data-i18n="pricing.team.cta"
             >
               Contact sales
             </a>
@@ -155,12 +328,11 @@
 
       <section id="docs" class="mx-auto max-w-6xl px-4 pb-20 sm:px-6 lg:px-8">
         <div class="rounded-xl border border-slate-800 bg-ink-900 p-6 sm:p-8">
-          <h2 class="text-xl font-semibold text-white">Docs</h2>
-          <p class="mt-2 text-sm leading-6 text-slate-400">
+          <h2 class="text-xl font-semibold text-white" data-i18n="docs.heading">Docs</h2>
+          <p class="mt-2 text-sm leading-6 text-slate-400" data-i18n="docs.body">
             Use your virtual key with the OpenAI-compatible chat endpoint. Set the base URL to
             this gateway and send
-            <code class="rounded bg-ink-800 px-1.5 py-0.5 font-mono text-cyan-300">Authorization: Bearer sk-vclient-...</code>
-            — upstream provider keys stay on the server.
+            Authorization: Bearer sk-vclient-... — upstream provider keys stay on the server.
           </p>
         </div>
       </section>
@@ -168,11 +340,223 @@
 
     <footer class="border-t border-slate-800">
       <div
-        class="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"
+        class="site-footer mx-auto flex max-w-6xl flex-col gap-2 px-4 py-8 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"
       >
-        <p>© 2026 AI API Gateway</p>
-        <p>Contact: your-email@example.com</p>
+        <p data-i18n="footer.copyright">© 2026 AI API Gateway</p>
+        <p data-i18n="footer.contact">Contact: your-email@example.com</p>
       </div>
     </footer>
+
+    <script>
+      const translations = {
+        en: {
+          nav: {
+            pricing: "Pricing",
+            docs: "Docs",
+            dashboard: "Dashboard",
+            getStarted: "Get Started",
+          },
+          hero: {
+            eyebrow: "OpenAI-compatible gateway",
+            title: "AI API for 1/10th the Cost",
+            subtitle: "Drop-in replacement for OpenAI API. Same quality, fraction of the price.",
+            cta: "Get Started",
+          },
+          features: {
+            compatible: {
+              kicker: "OpenAI Compatible",
+              title: "Change one line of code",
+              body: "Point your existing OpenAI SDK at our endpoint and keep the same request format. Migration takes minutes, not weeks.",
+            },
+            models: {
+              kicker: "Multi-Model",
+              title: "DeepSeek + Qwen + more",
+              body: "Route traffic across leading models from a single API. Pick the right quality and cost for each request.",
+            },
+            cdn: {
+              kicker: "Global CDN",
+              title: "Low latency, high availability",
+              body: "Serve completions close to your users with a globally distributed edge network built for uptime.",
+            },
+          },
+          pricing: {
+            heading: "Pricing",
+            subheading: "Start free. Scale when your traffic grows.",
+            perMonth: "/mo",
+            free: {
+              title: "Free",
+              description: "100K tokens / month",
+              f1: "OpenAI-compatible chat API",
+              f2: "Community support",
+              f3: "1 virtual API key",
+              cta: "Try it free",
+            },
+            developer: {
+              badge: "Most Popular",
+              title: "Developer",
+              description: "1M tokens / month",
+              f1: "Everything in Free",
+              f2: "Email support",
+              f3: "Higher rate limits",
+              cta: "Get Started",
+            },
+            team: {
+              badge: "Best Value",
+              title: "Team",
+              description: "10M tokens / month",
+              f1: "Everything in Developer",
+              f2: "Priority support",
+              f3: "Shared team usage and seats",
+              cta: "Contact sales",
+            },
+          },
+          docs: {
+            heading: "Docs",
+            body: "Use your virtual key with the OpenAI-compatible chat endpoint. Set the base URL to this gateway and send Authorization: Bearer sk-vclient-... — upstream provider keys stay on the server.",
+          },
+          footer: {
+            copyright: "© 2026 AI API Gateway",
+            contact: "Contact: your-email@example.com",
+          },
+          lang: {
+            label: "English",
+          },
+        },
+        zh: {
+          nav: {
+            pricing: "定价",
+            docs: "文档",
+            dashboard: "控制台",
+            getStarted: "立即开始",
+          },
+          hero: {
+            eyebrow: "兼容 OpenAI 的网关",
+            title: "成本仅有十分之一的 AI API",
+            subtitle: "OpenAI API 的即插即用替代方案。同等质量，价格仅有零头。",
+            cta: "立即开始",
+          },
+          features: {
+            compatible: {
+              kicker: "兼容 OpenAI",
+              title: "只需改一行代码",
+              body: "把现有 OpenAI SDK 的请求地址指向本网关，请求格式保持不变。迁移只需几分钟，而不是几周。",
+            },
+            models: {
+              kicker: "多模型",
+              title: "DeepSeek + 通义千问等",
+              body: "通过单一 API 在主流模型之间调度流量，为每个请求选择合适的质量与成本。",
+            },
+            cdn: {
+              kicker: "全球 CDN",
+              title: "低延迟，高可用",
+              body: "通过全球分布式边缘网络就近提供补全服务，专为稳定在线而设计。",
+            },
+          },
+          pricing: {
+            heading: "定价",
+            subheading: "免费起步，流量增长后再升级。",
+            perMonth: "/月",
+            free: {
+              title: "免费版",
+              description: "每月 10 万 tokens",
+              f1: "兼容 OpenAI 的 Chat API",
+              f2: "社区支持",
+              f3: "1 个虚拟 API Key",
+              cta: "免费试用",
+            },
+            developer: {
+              badge: "最受欢迎",
+              title: "开发者",
+              description: "每月 100 万 tokens",
+              f1: "包含免费版全部能力",
+              f2: "邮件支持",
+              f3: "更高速率限制",
+              cta: "立即开始",
+            },
+            team: {
+              badge: "超值之选",
+              title: "团队版",
+              description: "每月 1000 万 tokens",
+              f1: "包含开发者版全部能力",
+              f2: "优先支持",
+              f3: "团队用量与席位共享",
+              cta: "联系销售",
+            },
+          },
+          docs: {
+            heading: "文档",
+            body: "使用虚拟密钥调用兼容 OpenAI 的 Chat 接口。将 Base URL 设为本网关，并发送 Authorization: Bearer sk-vclient-... —— 上游供应商密钥始终留在服务器端。",
+          },
+          footer: {
+            copyright: "© 2026 AI API Gateway",
+            contact: "联系：your-email@example.com",
+          },
+          lang: {
+            label: "中文",
+          },
+        },
+      };
+
+      function lookup(dict, key) {
+        return key.split(".").reduce(function (acc, part) {
+          return acc && acc[part] != null ? acc[part] : undefined;
+        }, dict);
+      }
+
+      function applyLanguage(lang) {
+        var next = translations[lang] ? lang : "en";
+        var dict = translations[next];
+        document.documentElement.lang = next;
+        document.querySelectorAll("[data-i18n]").forEach(function (el) {
+          var value = lookup(dict, el.getAttribute("data-i18n"));
+          if (typeof value === "string") {
+            el.textContent = value;
+          }
+        });
+        var label = document.getElementById("lang-toggle-label");
+        if (label) {
+          label.textContent = dict.lang.label;
+        }
+        document.querySelectorAll(".lang-option").forEach(function (option) {
+          option.setAttribute("aria-selected", option.getAttribute("data-lang") === next ? "true" : "false");
+        });
+        localStorage.setItem("lang", next);
+      }
+
+      (function initI18n() {
+        var switcher = document.getElementById("lang-switcher");
+        var toggle = document.getElementById("lang-toggle");
+        var saved = localStorage.getItem("lang");
+        applyLanguage(saved === "zh" ? "zh" : "en");
+
+        function setOpen(open) {
+          switcher.classList.toggle("open", open);
+          toggle.setAttribute("aria-expanded", open ? "true" : "false");
+        }
+
+        toggle.addEventListener("click", function (event) {
+          event.stopPropagation();
+          setOpen(!switcher.classList.contains("open"));
+        });
+
+        document.querySelectorAll(".lang-option").forEach(function (option) {
+          option.addEventListener("click", function (event) {
+            event.stopPropagation();
+            applyLanguage(option.getAttribute("data-lang"));
+            setOpen(false);
+          });
+        });
+
+        document.addEventListener("click", function () {
+          setOpen(false);
+        });
+
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            setOpen(false);
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
