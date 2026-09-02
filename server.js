@@ -13,6 +13,9 @@ const PORT = process.env.PORT || 3000;
 const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions";
 const QWEN_API_URL =
   "https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions";
+const DOUBAO_API_URL =
+  "https://ark.cn-beijing.volces.com/api/v3/chat/completions";
+const ZHIPU_API_URL = "https://open.bigmodel.cn/api/paas/v4/chat/completions";
 
 const VIRTUAL_KEY_PREFIX = "sk-vclient-";
 const DEFAULT_BALANCE = 1_000_000;
@@ -169,6 +172,7 @@ app.post("/chat", authenticateVirtualKey, async (req, res) => {
   let upstreamModel;
   let providerName;
   let apiKeyEnv;
+  let modelEnv;
 
   if (modelName === "qwen") {
     apiUrl = QWEN_API_URL;
@@ -182,15 +186,35 @@ app.post("/chat", authenticateVirtualKey, async (req, res) => {
     apiKey = process.env.DEEPSEEK_API_KEY;
     upstreamModel = "deepseek-chat";
     providerName = "DeepSeek";
+  } else if (modelName === "doubao") {
+    apiUrl = DOUBAO_API_URL;
+    apiKeyEnv = "DOUBAO_API_KEY";
+    apiKey = process.env.DOUBAO_API_KEY;
+    modelEnv = "DOUBAO_MODEL";
+    upstreamModel = process.env.DOUBAO_MODEL;
+    providerName = "Doubao";
+  } else if (modelName === "glm") {
+    apiUrl = ZHIPU_API_URL;
+    apiKeyEnv = "ZHIPU_API_KEY";
+    apiKey = process.env.ZHIPU_API_KEY;
+    modelEnv = "ZHIPU_MODEL";
+    upstreamModel = process.env.ZHIPU_MODEL;
+    providerName = "Zhipu";
   } else {
     return res.status(400).json({
-      error: `Unsupported model "${requestedModel}". Use "deepseek" or "qwen".`,
+      error: `Unsupported model "${requestedModel}". Use "deepseek", "qwen", "doubao", or "glm".`,
     });
   }
 
   if (!apiKey) {
     return res.status(500).json({
       error: `Missing ${apiKeyEnv}. Set it in your .env file.`,
+    });
+  }
+
+  if (modelEnv && !upstreamModel) {
+    return res.status(500).json({
+      error: `Missing ${modelEnv}. Set it in your .env file.`,
     });
   }
 

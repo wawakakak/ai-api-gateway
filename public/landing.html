@@ -164,15 +164,26 @@
         position: absolute;
         right: 0;
         top: calc(100% + 0.4rem);
-        min-width: 11.5rem;
+        min-width: 13.5rem;
+        max-height: min(24rem, calc(100vh - 5.5rem));
+        overflow-y: auto;
         padding: 0.4rem;
         border-radius: 0.9rem;
         border: 1px solid rgba(255, 255, 255, 0.1);
-        background: rgba(15, 23, 42, 0.88);
+        background: rgba(15, 23, 42, 0.92);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
         box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 24px rgba(6, 182, 212, 0.08);
         z-index: 50;
+      }
+
+      .lang-menu::-webkit-scrollbar {
+        width: 6px;
+      }
+
+      .lang-menu::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.35);
+        border-radius: 999px;
       }
 
       .lang-switcher.open .lang-menu {
@@ -783,14 +794,20 @@
                 <button type="button" class="lang-option" role="option" data-lang="en" aria-selected="true">
                   🇺🇸 English
                 </button>
-                <button type="button" class="lang-option" role="option" data-lang="ja" aria-selected="false">
-                  🇯🇵 日本語
+                <button type="button" class="lang-option" role="option" data-lang="es" aria-selected="false">
+                  🇪🇸 Español
                 </button>
-                <button type="button" class="lang-option" role="option" data-lang="ko" aria-selected="false">
-                  🇰🇷 한국어
+                <button type="button" class="lang-option" role="option" data-lang="pt" aria-selected="false">
+                  🇵🇹 Português
                 </button>
                 <button type="button" class="lang-option" role="option" data-lang="fr" aria-selected="false">
                   🇫🇷 Français
+                </button>
+                <button type="button" class="lang-option" role="option" data-lang="de" aria-selected="false">
+                  🇩🇪 Deutsch
+                </button>
+                <button type="button" class="lang-option" role="option" data-lang="ja" aria-selected="false">
+                  🇯🇵 日本語
                 </button>
                 <button type="button" class="lang-option" role="option" data-lang="zh" aria-selected="false">
                   🇨🇳 中文
@@ -822,7 +839,7 @@
             </article>
             <article class="glass-card reveal delay-1">
               <h2 class="card-title" data-i18n="features.models.title">Multi-Model</h2>
-              <p class="card-body" data-i18n="features.models.body">DeepSeek + Qwen + more. Auto-failover.</p>
+              <p class="card-body" data-i18n="features.models.body">DeepSeek + Qwen + Doubao + Zhipu + more. Auto-failover.</p>
             </article>
             <article class="glass-card reveal delay-2">
               <span class="dot dot-br" aria-hidden="true"></span>
@@ -921,7 +938,7 @@
       >
         Open in Telegram
       </a>
-      <a class="tg-mail" href="mailto:kenji618@163.com">📧 kenji618@163.com</a>
+      <a class="tg-mail" href="mailto:kenji618@163.com" data-i18n="telegram.email">📧 kenji618@163.com</a>
     </div>
     <button type="button" class="tg-fab" id="tg-fab" aria-label="Open Telegram support" aria-expanded="false">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -955,7 +972,7 @@
             },
             models: {
               title: "Multi-Model",
-              body: "DeepSeek + Qwen + more. Auto-failover.",
+              body: "DeepSeek + Qwen + Doubao + Zhipu + more. Auto-failover.",
             },
             cdn: {
               title: "Global CDN",
@@ -1005,9 +1022,162 @@
             title: "💬 Live Support",
             subtitle: "We typically reply in minutes",
             open: "Open in Telegram",
+            email: "📧 kenji618@163.com",
           },
           lang: {
             label: "English",
+          },
+        },
+        es: {
+          nav: {
+            pricing: "Precios",
+            docs: "Documentos",
+            dashboard: "Panel",
+            getStarted: "Empezar",
+          },
+          hero: {
+            eyebrow: "PUERTA DE ENLACE COMPATIBLE CON OPENAI",
+            title: "API de IA por 1/10 del costo",
+            subtitle: "Reemplazo directo de la API de OpenAI. Misma calidad, fracción del precio.",
+            cta: "Empezar",
+          },
+          features: {
+            compatible: {
+              title: "Compatible con OpenAI",
+              body: "Cambia la URL base y la clave. Cero cambios de código.",
+            },
+            models: {
+              title: "Multi-Modelo",
+              body: "DeepSeek + Qwen + Doubao + Zhipu y más. Conmutación automática.",
+            },
+            cdn: {
+              title: "CDN Global",
+              body: "Baja latencia mundial. 99.9% de disponibilidad.",
+            },
+          },
+          pricing: {
+            heading: "Precios",
+            subheading: "Empieza gratis. Escala cuando crezca tu tráfico.",
+            perMonth: "/mes",
+            free: {
+              title: "Gratis",
+              description: "100K tokens",
+              f1: "API de chat compatible con OpenAI",
+              f2: "Soporte de la comunidad",
+              f3: "1 clave API virtual",
+              cta: "Empezar",
+            },
+            developer: {
+              badge: "Más Popular",
+              title: "Desarrollador",
+              description: "1M tokens",
+              f1: "Todo lo incluido en Gratis",
+              f2: "Soporte por correo",
+              f3: "Límites de velocidad más altos",
+              cta: "Empezar",
+            },
+            team: {
+              badge: "Mejor valor",
+              title: "Equipo",
+              description: "10M tokens",
+              f1: "Todo lo incluido en Desarrollador",
+              f2: "Soporte prioritario",
+              f3: "Uso y asientos compartidos del equipo",
+              cta: "Contactar Ventas",
+            },
+          },
+          docs: {
+            heading: "Documentos",
+            body: "Usa tu clave virtual con el endpoint de chat compatible con OpenAI. Configura la URL base de este gateway y envía Authorization: Bearer sk-vclient-... — las claves de los proveedores upstream permanecen en el servidor.",
+          },
+          footer: {
+            copyright: "© 2026 AI API Gateway",
+            contact: "Contacto: kenji618@163.com",
+          },
+          telegram: {
+            title: "💬 Soporte en Vivo",
+            subtitle: "Respondemos en minutos",
+            open: "Abrir en Telegram",
+            email: "📧 kenji618@163.com",
+          },
+          lang: {
+            label: "Español",
+          },
+        },
+        pt: {
+          nav: {
+            pricing: "Preços",
+            docs: "Documentos",
+            dashboard: "Painel",
+            getStarted: "Começar",
+          },
+          hero: {
+            eyebrow: "GATEWAY COMPATÍVEL COM OPENAI",
+            title: "API de IA por 1/10 do custo",
+            subtitle: "Substituição direta da API da OpenAI. Mesma qualidade, fração do preço.",
+            cta: "Começar",
+          },
+          features: {
+            compatible: {
+              title: "Compatível com OpenAI",
+              body: "Altere a URL base e a chave. Zero mudanças de código.",
+            },
+            models: {
+              title: "Multi-Modelo",
+              body: "DeepSeek + Qwen + Doubao + Zhipu e mais. Failover automático.",
+            },
+            cdn: {
+              title: "CDN Global",
+              body: "Baixa latência mundial. 99.9% de tempo de atividade.",
+            },
+          },
+          pricing: {
+            heading: "Preços",
+            subheading: "Comece grátis. Escale quando o tráfego crescer.",
+            perMonth: "/mês",
+            free: {
+              title: "Grátis",
+              description: "100K tokens",
+              f1: "API de chat compatível com OpenAI",
+              f2: "Suporte da comunidade",
+              f3: "1 chave API virtual",
+              cta: "Começar",
+            },
+            developer: {
+              badge: "Mais Popular",
+              title: "Desenvolvedor",
+              description: "1M tokens",
+              f1: "Tudo do plano Grátis",
+              f2: "Suporte por e-mail",
+              f3: "Limites de taxa mais altos",
+              cta: "Começar",
+            },
+            team: {
+              badge: "Melhor valor",
+              title: "Equipe",
+              description: "10M tokens",
+              f1: "Tudo do plano Desenvolvedor",
+              f2: "Suporte prioritário",
+              f3: "Uso e assentos compartilhados da equipe",
+              cta: "Contatar Vendas",
+            },
+          },
+          docs: {
+            heading: "Documentos",
+            body: "Use sua chave virtual com o endpoint de chat compatível com OpenAI. Defina a URL base para este gateway e envie Authorization: Bearer sk-vclient-... — as chaves dos provedores upstream permanecem no servidor.",
+          },
+          footer: {
+            copyright: "© 2026 AI API Gateway",
+            contact: "Contato: kenji618@163.com",
+          },
+          telegram: {
+            title: "💬 Suporte ao Vivo",
+            subtitle: "Respondemos em minutos",
+            open: "Abrir no Telegram",
+            email: "📧 kenji618@163.com",
+          },
+          lang: {
+            label: "Português",
           },
         },
         zh: {
@@ -1026,15 +1196,15 @@
           features: {
             compatible: {
               title: "兼容 OpenAI",
-              body: "只需改一行代码。把现有 OpenAI SDK 的请求地址指向本网关，请求格式保持不变。迁移只需几分钟，而不是几周。",
+              body: "只需改一行代码。把现有 OpenAI SDK 的请求地址指向本网关，请求格式保持不变。",
             },
             models: {
               title: "多模型",
-              body: "DeepSeek + 通义千问等。通过单一 API 在主流模型之间调度流量，为每个请求选择合适的质量与成本。",
+              body: "DeepSeek + 通义千问 + 豆包 + 智谱等。通过单一 API 在主流模型之间调度流量。",
             },
             cdn: {
               title: "全球 CDN",
-              body: "低延迟，高可用。通过全球分布式边缘网络就近提供补全服务，专为稳定在线而设计。",
+              body: "低延迟，高可用。通过全球分布式边缘网络就近提供补全服务。",
             },
           },
           pricing: {
@@ -1043,7 +1213,7 @@
             perMonth: "/月",
             free: {
               title: "免费版",
-              description: "每月 10 万 tokens",
+              description: "100K tokens",
               f1: "兼容 OpenAI 的 Chat API",
               f2: "社区支持",
               f3: "1 个虚拟 API Key",
@@ -1052,7 +1222,7 @@
             developer: {
               badge: "最受欢迎",
               title: "开发者",
-              description: "每月 100 万 tokens",
+              description: "1M tokens",
               f1: "包含免费版全部能力",
               f2: "邮件支持",
               f3: "更高速率限制",
@@ -1061,7 +1231,7 @@
             team: {
               badge: "超值之选",
               title: "团队版",
-              description: "每月 1000 万 tokens",
+              description: "10M tokens",
               f1: "包含开发者版全部能力",
               f2: "优先支持",
               f3: "团队用量与席位共享",
@@ -1074,12 +1244,13 @@
           },
           footer: {
             copyright: "© 2026 AI API Gateway",
-            contact: "联系：kenji618@163.com",
+            contact: "联系方式: kenji618@163.com",
           },
           telegram: {
             title: "💬 实时支持",
             subtitle: "通常几分钟内回复",
             open: "在 Telegram 打开",
+            email: "📧 kenji618@163.com",
           },
           lang: {
             label: "中文",
@@ -1105,7 +1276,7 @@
             },
             models: {
               title: "マルチモデル",
-              body: "DeepSeek + Qwen など。自動フェイルオーバー。",
+              body: "DeepSeek + Qwen + 豆包 + 智譜など。自動フェイルオーバー。",
             },
             cdn: {
               title: "グローバルCDN",
@@ -1153,86 +1324,88 @@
           },
           telegram: {
             title: "💬 ライブサポート",
-            subtitle: "通常数分以内に返信します",
+            subtitle: "数分以内に返信",
             open: "Telegramで開く",
+            email: "📧 kenji618@163.com",
           },
           lang: {
             label: "日本語",
           },
         },
-        ko: {
+        de: {
           nav: {
-            pricing: "가격",
-            docs: "문서",
-            dashboard: "대시보드",
-            getStarted: "시작하기",
+            pricing: "Preise",
+            docs: "Dokumente",
+            dashboard: "Dashboard",
+            getStarted: "Loslegen",
           },
           hero: {
-            eyebrow: "OpenAI 호환 게이트웨이",
-            title: "OpenAI API의 1/10 비용으로 AI API",
-            subtitle: "OpenAI API의 드롭인 대체품. 동일한 품질, 훨씬 저렴한 가격.",
-            cta: "시작하기",
+            eyebrow: "OPENAI-KOMPATIBLES GATEWAY",
+            title: "KI-API für 1/10 der Kosten",
+            subtitle: "Direkter Ersatz für die OpenAI-API. Gleiche Qualität, Bruchteil des Preises.",
+            cta: "Loslegen",
           },
           features: {
             compatible: {
-              title: "OpenAI 호환",
-              body: "베이스 URL과 키만 변경. 코드 변경 없음.",
+              title: "OpenAI-kompatibel",
+              body: "Ändern Sie Basis-URL und Schlüssel. Null Code-Änderungen.",
             },
             models: {
-              title: "멀티 모델",
-              body: "DeepSeek + Qwen 등. 자동 장애 조치.",
+              title: "Multi-Modell",
+              body: "DeepSeek + Qwen + Doubao + Zhipu und mehr. Automatisches Failover.",
             },
             cdn: {
-              title: "글로벌 CDN",
-              body: "전 세계 저지연. 99.9% 가동 시간.",
+              title: "Globales CDN",
+              body: "Geringe Latenz weltweit. 99,9% Verfügbarkeit.",
             },
           },
           pricing: {
-            heading: "가격",
-            subheading: "무료로 시작하고, 트래픽이 늘면 확장하세요.",
-            perMonth: "/월",
+            heading: "Preise",
+            subheading: "Kostenlos starten. Skalieren, wenn der Traffic wächst.",
+            perMonth: "/Monat",
             free: {
-              title: "무료",
-              description: "10만 토큰",
-              f1: "OpenAI 호환 채팅 API",
-              f2: "커뮤니티 지원",
-              f3: "가상 API 키 1개",
-              cta: "시작하기",
+              title: "Kostenlos",
+              description: "100K Tokens",
+              f1: "OpenAI-kompatible Chat-API",
+              f2: "Community-Support",
+              f3: "1 virtueller API-Schlüssel",
+              cta: "Loslegen",
             },
             developer: {
-              badge: "인기",
-              title: "개발자",
-              description: "100만 토큰",
-              f1: "무료 플랜의 모든 기능",
-              f2: "이메일 지원",
-              f3: "더 높은 요청 한도",
-              cta: "시작하기",
+              badge: "Beliebt",
+              title: "Entwickler",
+              description: "1M Tokens",
+              f1: "Alles aus Kostenlos",
+              f2: "E-Mail-Support",
+              f3: "Höhere Rate-Limits",
+              cta: "Loslegen",
             },
             team: {
-              badge: "최고 가치",
-              title: "팀",
-              description: "1000만 토큰",
-              f1: "개발자 플랜의 모든 기능",
-              f2: "우선 지원",
-              f3: "팀 사용량 및 좌석 공유",
-              cta: "영업 문의",
+              badge: "Bester Wert",
+              title: "Team",
+              description: "10M Tokens",
+              f1: "Alles aus Entwickler",
+              f2: "Priorisierter Support",
+              f3: "Geteilte Team-Nutzung und Sitze",
+              cta: "Vertrieb kontaktieren",
             },
           },
           docs: {
-            heading: "문서",
-            body: "가상 키로 OpenAI 호환 채팅 엔드포인트를 사용하세요. 베이스 URL을 이 게이트웨이로 설정하고 Authorization: Bearer sk-vclient-... 를 전송하세요. 업스트림 공급자 키는 서버에 남습니다.",
+            heading: "Dokumente",
+            body: "Nutzen Sie Ihren virtuellen Schlüssel mit dem OpenAI-kompatiblen Chat-Endpunkt. Setzen Sie die Basis-URL auf dieses Gateway und senden Sie Authorization: Bearer sk-vclient-... — Upstream-Anbieterschlüssel bleiben auf dem Server.",
           },
           footer: {
             copyright: "© 2026 AI API Gateway",
-            contact: "문의: kenji618@163.com",
+            contact: "Kontakt: kenji618@163.com",
           },
           telegram: {
-            title: "💬 실시간 지원",
-            subtitle: "보통 몇 분 내에 답변합니다",
-            open: "Telegram에서 열기",
+            title: "💬 Live-Support",
+            subtitle: "Wir antworten in Minuten",
+            open: "In Telegram öffnen",
+            email: "📧 kenji618@163.com",
           },
           lang: {
-            label: "한국어",
+            label: "Deutsch",
           },
         },
         fr: {
@@ -1255,7 +1428,7 @@
             },
             models: {
               title: "Multi-modèle",
-              body: "DeepSeek + Qwen et plus. Basculement auto.",
+              body: "DeepSeek + Qwen + Doubao + Zhipu et plus. Basculement auto.",
             },
             cdn: {
               title: "CDN mondial",
@@ -1302,9 +1475,10 @@
             contact: "Contact : kenji618@163.com",
           },
           telegram: {
-            title: "💬 Support en direct",
-            subtitle: "Nous répondons généralement en quelques minutes",
+            title: "💬 Support en Direct",
+            subtitle: "Réponse en quelques minutes",
             open: "Ouvrir dans Telegram",
+            email: "📧 kenji618@163.com",
           },
           lang: {
             label: "Français",
